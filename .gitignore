@@ -1,0 +1,13 @@
+
+.env
+ca.pem
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+instance/
+.DS_Store
+Thumbs.db
