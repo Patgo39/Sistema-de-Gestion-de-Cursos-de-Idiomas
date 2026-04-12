@@ -19,7 +19,7 @@ def iniciar_sesion():
             elif usuario_valido.rol == 'docente':
                 return redirect('/tablero_docente')
         else:
-            flash("Usuario o contraseñas incorrectos. Inetnta de nuevo")
+            flash("Usuario o contraseñas incorrectos. Intenta de nuevo")
             return redirect('/login')
 
 @login_bp.route('/tablero_alumno')
