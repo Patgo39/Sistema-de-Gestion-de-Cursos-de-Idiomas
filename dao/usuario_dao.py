@@ -19,8 +19,9 @@ class UsuarioDao:
                 pais=pais,
                 rol='alumno'
             )
-            nuevo_alumno = Alumno(id_usuario= nuevo_usuario, grado_actual=grado_actual)
             db.session.add(nuevo_usuario)
+            db.session.flush()
+            nuevo_alumno = Alumno(id_usuario=nuevo_usuario.id_usuario, grado_actual=grado_actual)
             db.session.add(nuevo_alumno)
             db.session.commit()
             return True
@@ -43,12 +44,13 @@ class UsuarioDao:
                 genero=genero,
                 pais=pais
             )
-            nuevo_docente= Docente(
-                id_usuario=nuevo_usuario,
+            db.session.add(nuevo_usuario)
+            db.session.flush()
+            nuevo_docente = Docente(
+                id_usuario=nuevo_usuario.id_usuario,
                 tiempo_experiencia=tiempo_experiencia,
                 especialidad=especialidad
             )
-            db.session.add(nuevo_usuario)
             db.session.add(nuevo_docente)
             db.session.commit()
             return True
