@@ -15,9 +15,9 @@ def iniciar_sesion():
             session['username'] = usuario_valido.username
             session['rol']=usuario_valido.rol
 
-            if usuario_valido.rol == 'alumno':
+            if usuario_valido.rol == 'Alumno':
                 return redirect(url_for('alumno.tablero_alumno'))
-            elif usuario_valido.rol == 'docente':
+            elif usuario_valido.rol == 'Docente':
                 return redirect(url_for('docente.tablero_docente'))
         else:
             flash("Usuario o contraseñas incorrectos. Intenta de nuevo")
