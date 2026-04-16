@@ -3,11 +3,13 @@ from db import db
 import os
 from dotenv import load_dotenv
 from controllers.login_controller import login_bp
+from datetime import timedelta
 
 # Cargar variables de entorno
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 # Configuración de Aiven
 user = os.getenv('DB_USER')
