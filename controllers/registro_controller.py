@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, flash
+from flask import Blueprint, render_template, request, redirect, flash, url_for
 from dao.usuario_dao import UsuarioDao
-registro_bp = Blueprint('registro', __name__)
+
+registro_bp = Blueprint('sign_up', __name__)
+
 @registro_bp.route('/registro', methods=['GET', 'POST'])
 def registrar_usuario():
     if request.method == 'GET':
@@ -38,7 +40,7 @@ def registrar_usuario():
                 flash('Usuario registrado exitosamente')
             else:
                 flash("Error al registrar docente")
-                return redirect('/registro')
+                return redirect(url_for('sign_up.registrar_usuario'))
 
         elif rol=='alumno':
             grado_actual=request.form.get('grado_actual')
@@ -58,6 +60,6 @@ def registrar_usuario():
                 flash('Usuario registrado exitosamente')
             else:
                 flash("Error al registrar alumno")
-                return redirect('/registro')
-        return redirect('/login')
+                return redirect(url_for('sign_up.registrar_usuario'))
+        return redirect(url_for('auth.iniciar_sesion'))
 
