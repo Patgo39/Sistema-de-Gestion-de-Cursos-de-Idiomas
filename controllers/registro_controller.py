@@ -1,7 +1,9 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, flash, url_for
 from dao.usuario_dao import UsuarioDao
-registro_bp = Blueprint('registro', __name__)
+
+registro_bp = Blueprint('sign_up', __name__)
+
 @registro_bp.route('/registro', methods=['GET', 'POST'])
 def registrar_usuario():
     if request.method == 'GET':
@@ -60,7 +62,11 @@ def registrar_usuario():
                 flash('Usuario registrado exitosamente')
             else:
                 flash("Error al registrar alumno")
+<<<<<<< HEAD
                 return redirect(url_for('registro.registrar_usuario'))
 
+=======
+                return redirect(url_for('sign_up.registrar_usuario'))
+>>>>>>> main
         return redirect(url_for('auth.iniciar_sesion'))
 

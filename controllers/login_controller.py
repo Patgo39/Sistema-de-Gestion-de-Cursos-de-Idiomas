@@ -23,10 +23,5 @@ def iniciar_sesion():
             flash("Usuario o contraseñas incorrectos. Intenta de nuevo")
             return redirect(url_for('auth.iniciar_sesion'))
 
-@login_bp.route('/tablero_alumno')
-def tablero_alumno():
-    return f"Bienvenido {session['username']}"
-@login_bp.route('/tablero_docente')
-def tablero_docente():
-    return f"Bienvenido {session['username']}"
+
 
