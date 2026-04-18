@@ -19,14 +19,15 @@ class UsuarioDao:
                 pais=pais,
                 rol='alumno'
             )
-            nuevo_alumno = Alumno(id_usuario= nuevo_usuario, grado_actual=grado_actual)
             db.session.add(nuevo_usuario)
+            db.session.flush()
+            nuevo_alumno = Alumno(id_usuario=nuevo_usuario.id_usuario, grado_actual=grado_actual)
             db.session.add(nuevo_alumno)
             db.session.commit()
             return True
         except Exception as e:
             db.session.rollback()
-            print(f"Erro  al registar nuevo usuario: {e}")
+            print(f"Error al registar nuevo usuario: {e}")
             return False
     @staticmethod
     def registrar_docente(username, nombre, apellido_paterno, apellido_materno, email, fecha_nacimiento, password,genero, pais,tiempo_experiencia,especialidad):
@@ -43,18 +44,19 @@ class UsuarioDao:
                 genero=genero,
                 pais=pais
             )
-            nuevo_docente= Docente(
-                id_usuario=nuevo_usuario,
+            db.session.add(nuevo_usuario)
+            db.session.flush()
+            nuevo_docente = Docente(
+                id_usuario=nuevo_usuario.id_usuario,
                 tiempo_experiencia=tiempo_experiencia,
                 especialidad=especialidad
             )
-            db.session.add(nuevo_usuario)
             db.session.add(nuevo_docente)
             db.session.commit()
             return True
         except Exception as e:
             db.session.rollback()
-            print(f"Erro  al registar nuevo docente: {e}")
+            print(f"Error al registar nuevo docente: {e}")
             return False
     @staticmethod
     def verificar_login(username, password):
@@ -65,7 +67,7 @@ class UsuarioDao:
             else:
                 return None
         except Exception as e:
-            print(f"Erro  al verificar login: {e}")
+            print(f"Error al verificar login: {e}")
             return False
 
 
