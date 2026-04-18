@@ -15,6 +15,7 @@ def iniciar_sesion():
             session['username'] = usuario_valido.username
             session['rol']=usuario_valido.rol
 
+
             if usuario_valido.rol == 'Alumno':
                 return redirect(url_for('alumno.tablero_alumno'))
             elif usuario_valido.rol == 'Docente':
