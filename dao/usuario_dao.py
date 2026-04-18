@@ -42,7 +42,8 @@ class UsuarioDao:
                 fecha_nacimiento=fecha_nacimiento,
                 password=password,
                 genero=genero,
-                pais=pais
+                pais=pais,
+                rol='docente'
             )
             db.session.add(nuevo_usuario)
             db.session.flush()

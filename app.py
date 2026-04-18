@@ -3,6 +3,8 @@ from db import db
 import os
 from dotenv import load_dotenv
 from controllers.login_controller import login_bp
+from controllers.registro_controller import registro_bp
+from controllers.recurso_controller import recursos_bp
 from datetime import timedelta
 
 load_dotenv()
@@ -23,6 +25,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 app.register_blueprint(login_bp, url_prefix='/auth')
+app.register_blueprint(registro_bp, url_prefix='/auth')
+app.register_blueprint(recursos_bp, url_prefix='/auth')
 
 @app.route('/')
 def index():

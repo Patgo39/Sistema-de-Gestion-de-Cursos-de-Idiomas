@@ -11,6 +11,7 @@ class Usuario(db.Model):
     password = db.Column(db.String(255))
     genero=db.Column(db.String(50))
     pais=db.Column(db.String(50))
+    fecha_nacimiento = db.Column(db.Date)
     ultima_fecha_acceso=db.Column(db.DateTime)
     rol=db.Column(db.String(50))
 
