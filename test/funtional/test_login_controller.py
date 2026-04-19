@@ -28,11 +28,11 @@ def test_alumno_exitoso(client, app, db):
     })
 
     assert response.status_code == 302
-    assert '/auth/tablero_alumno' in response.headers['Location']
+    assert '/alumno/tablero_alumno' in response.headers['Location']
 
     with client.session_transaction() as session:
         assert session['username'] == 'alumno_login'
-        assert session['rol'] == 'alumno'
+        assert session['rol'] == 'Alumno'
         assert session.get('usuario') is not None
 
 

@@ -24,7 +24,7 @@ def test_registrar_alumno_flujo_completo(app, db):
 
         usuario = Usuario.query.filter_by(username="estudiante1").first()
         assert usuario is not None
-        assert usuario.rol == 'alumno'
+        assert usuario.rol == 'Alumno'
 
         alumno = Alumno.query.filter_by(id_usuario=usuario.id_usuario).first()
         assert alumno is not None
@@ -63,8 +63,7 @@ def test_registrar_docente_exitoso(app, db):
 
 def test_verificar_login_exitoso(app, db):
     with app.app_context():
-
-        user = Usuario(username="login_test", password="secret_password", email="login@test.com")
+        user = Usuario(username="login_test", password="secret_password", email="login@test.com", rol="alumno")
         db.session.add(user)
         db.session.commit()
 
@@ -76,8 +75,7 @@ def test_verificar_login_exitoso(app, db):
 
 def test_verificar_login_fallido(app, db):
     with app.app_context():
-
-        user = Usuario(username="user_fail", password="correct_password", email="fail@test.com")
+        user = Usuario(username="user_fail", password="correct_password", email="fail@test.com", rol="Alumno")
         db.session.add(user)
         db.session.commit()
 

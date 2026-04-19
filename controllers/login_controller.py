@@ -6,19 +6,24 @@ login_bp = Blueprint('auth', __name__)
 def iniciar_sesion():
     if request.method == 'GET':
         return render_template('auth/LoginIH.html')
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        usuario_valido=UsuarioDao.verificar_login(username,password)
+        usuario_valido = UsuarioDao.verificar_login(username, password)
+
         if usuario_valido:
+
             session['usuario'] = usuario_valido.id_usuario
             session['username'] = usuario_valido.username
-            session['rol']=usuario_valido.rol
+            session['rol'] = usuario_valido.rol
 
+
+            rol_validar = usuario_valido.rol.lower()
 
             if usuario_valido.rol == 'Alumno':
                 return redirect(url_for('alumno.tablero_alumno'))
-            elif usuario_valido.rol == 'Docente':
+            elif rol_validar == 'docente':
                 return redirect(url_for('docente.tablero_docente'))
         else:
             flash("Usuario o contraseñas incorrectos. Intenta de nuevo")
