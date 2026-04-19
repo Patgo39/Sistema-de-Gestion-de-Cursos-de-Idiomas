@@ -4,27 +4,29 @@ from dao.usuario_dao import UsuarioDao
 
 registro_bp = Blueprint('sign_up', __name__)
 
+
 @registro_bp.route('/registro', methods=['GET', 'POST'])
 def registrar_usuario():
     if request.method == 'GET':
         return render_template('RegistroUsuarioIH.html')
-    if request.method == 'POST':
-        username=request.form.get('username')
-        nombre=request.form.get('nombre')
-        apellido_paterno=request.form.get('apellido_paterno')
-        apellido_materno=request.form.get('apellido_materno')
-        email=request.form.get('email')
-        fecha_str=request.form.get('fecha_nacimiento')
-        fecha_nacimiento=datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        password=request.form.get('password')
-        genero=request.form.get('genero')
-        pais=request.form.get('pais')
-        rol=request.form.get('rol')
 
-        if rol=='docente':
-            tiempo_experiencia=int(request.form.get('tiempo_experiencia'))
-            especialidad=request.form.get('especialidad')
-            exito= UsuarioDao.registrar_docente(
+    if request.method == 'POST':
+        username = request.form.get('username')
+        nombre = request.form.get('nombre')
+        apellido_paterno = request.form.get('apellido_paterno')
+        apellido_materno = request.form.get('apellido_materno')
+        email = request.form.get('email')
+        fecha_str = request.form.get('fecha_nacimiento')
+        fecha_nacimiento = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        password = request.form.get('password')
+        genero = request.form.get('genero')
+        pais = request.form.get('pais')
+        rol = request.form.get('rol')
+
+        if rol == 'docente':
+            tiempo_experiencia = int(request.form.get('tiempo_experiencia'))
+            especialidad = request.form.get('especialidad')
+            exito = UsuarioDao.registrar_docente(
                 username=username,
                 nombre=nombre,
                 apellido_paterno=apellido_paterno,
@@ -40,13 +42,14 @@ def registrar_usuario():
 
             if exito:
                 flash('Usuario registrado exitosamente')
+                return redirect(url_for('auth.iniciar_sesion'))
             else:
                 flash("Error al registrar docente")
-                return redirect(url_for('registro.registrar_usuario'))
+                return redirect(url_for('sign_up.registrar_usuario'))
 
-        elif rol=='alumno':
-            grado_actual=request.form.get('grado_actual')
-            exito=UsuarioDao.registrar_alumno(
+        elif rol == 'alumno':
+            grado_actual = request.form.get('grado_actual')
+            exito = UsuarioDao.registrar_alumno(
                 username=username,
                 nombre=nombre,
                 apellido_paterno=apellido_paterno,
@@ -58,15 +61,11 @@ def registrar_usuario():
                 pais=pais,
                 grado_actual=grado_actual
             )
+
             if exito:
                 flash('Usuario registrado exitosamente')
+                return redirect(url_for('auth.iniciar_sesion'))
             else:
                 flash("Error al registrar alumno")
-<<<<<<< HEAD
-                return redirect(url_for('registro.registrar_usuario'))
-
-=======
                 return redirect(url_for('sign_up.registrar_usuario'))
->>>>>>> main
-        return redirect(url_for('auth.iniciar_sesion'))
 

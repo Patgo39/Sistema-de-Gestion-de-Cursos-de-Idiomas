@@ -5,9 +5,8 @@ from models.docente import Docente
 
 
 def test_cargar_pagina_registro(client):
-    response = client.get("/auth/registro")
+    response = client.get("/sign_up/registro")
     assert response.status_code == 200
-
 
 
 def test_registro_docente_exitoso(client, app, db):
@@ -25,7 +24,7 @@ def test_registro_docente_exitoso(client, app, db):
         "tiempo_experiencia": "4",
         "especialidad": "Inglés"
     }
-    response = client.post("/auth/registro", data=datos_formulario)
+    response = client.post("/sign_up/registro", data=datos_formulario)
     assert response.status_code == 302
 
     assert 'login' in response.headers['Location']
@@ -53,7 +52,7 @@ def test_registro_alumno_exitoso(client, app, db):
         "rol": "alumno",
         "grado_actual": "2do Semestre"
     }
-    response = client.post("/auth/registro", data=datos_formulario)
+    response = client.post("/sign_up/registro", data=datos_formulario)
     assert response.status_code == 302
     assert 'login' in response.headers['Location']
     with app.app_context():

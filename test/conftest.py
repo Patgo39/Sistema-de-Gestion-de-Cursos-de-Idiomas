@@ -1,12 +1,10 @@
 import os
 import pytest
+import models
 from sqlalchemy import create_engine
 os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 from app import app as flask_app
 from db import db as _db
-from models.usuario import Usuario
-from models.alumno import Alumno
-from models.docente import Docente
 
 
 @pytest.fixture

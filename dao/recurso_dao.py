@@ -4,12 +4,12 @@ from models.recurso import Recurso
 
 class RecursoDao:
     @staticmethod
-    def guardar_recurso(nombre,filename,descripcion, id_profe):
+    def guardar_recurso(titulo, filename, descripcion, id_curso):
         nuevo_recurso = Recurso(
-            nombre_recurso = nombre,
-            archivo_url = filename,
-            descripcion = descripcion,
-            id_docente = id_profe
+            titulo_recurso=titulo,
+            archivo_url=filename,
+            descripcion=descripcion,
+            id_curso=id_curso
         )
         db.session.add(nuevo_recurso)
         db.session.commit()

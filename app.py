@@ -3,13 +3,10 @@ from db import db
 import os
 from dotenv import load_dotenv
 from controllers.login_controller import login_bp
-from controllers.registro_controller import registro_bp
-<<<<<<< HEAD
 from controllers.recurso_controller import recursos_bp
-=======
+from controllers.registro_controller import registro_bp
 from controllers.alumno_controller import alumno_bp
 from controllers.docente_controller import docente_bp
->>>>>>> main
 from datetime import timedelta
 
 load_dotenv()
@@ -30,15 +27,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 app.register_blueprint(login_bp, url_prefix='/auth')
-<<<<<<< HEAD
-app.register_blueprint(registro_bp, url_prefix='/auth')
-app.register_blueprint(recursos_bp, url_prefix='/auth')
-=======
 app.register_blueprint(registro_bp, url_prefix='/sign_up')
-
 app.register_blueprint(alumno_bp, url_prefix='/alumno')
 app.register_blueprint(docente_bp, url_prefix='/docente')
->>>>>>> main
+
+app.register_blueprint(recursos_bp, url_prefix='/recursos')
 
 @app.route('/')
 def index():
