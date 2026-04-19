@@ -1,42 +1,47 @@
-import os
-from flask import Blueprint, request, redirect, flash, session, current_app, url_for, render_template
-from werkzeug.utils import secure_filename
-from dao.recurso_dao import RecursoDao
+from flask import Blueprint, request, jsonify
 from dao.curso_dao import CursoDao
 
-recursos_bp = Blueprint('recursos', __name__)
+
+curso_bp = Blueprint('curso_bp', __name__)
 
 
-@recursos_bp.route('/subir_recurso/<int:id_curso>', methods=['GET', 'POST'])
-def subir_recurso(id_curso):
-    if 'usuario' not in session:
-        return redirect(url_for('auth.iniciar_sesion'))
+@curso_bp.route('/cursos', methods=['POST'])
+def crear_curso():
+    data = request.get_json()
 
-    if request.method == 'GET':
-        
-        return render_template('RegistroUsuarioIH.html', id_curso=id_curso)
+    nombre = data.get('nombre_curso')
+    descripcion = data.get('descripcion')
+    nivel = data.get('nivel')
+    id_usuario = data.get('id_usuario')
+    id_idioma = data.get('id_idioma')
 
-    if request.method == 'POST':
-        archivo = request.files.get('archivo')
-        nombre_recurso = request.form.get('nombre_recurso')
-        descripcion = request.form.get('descripcion')
+    if not all([nombre, id_usuario, id_idioma]):
+        return jsonify({"error": "Faltan datos obligatorios"}), 400
 
-        if archivo and archivo.filename != '':
-            filename = secure_filename(archivo.filename)
+    nuevo_curso = CursoDao.crear_curso(nombre, descripcion, nivel, id_usuario, id_idioma)
 
-            if not os.path.exists(current_app.config['UPLOAD_FOLDER']):
-                os.makedirs(current_app.config['UPLOAD_FOLDER'])
+    if nuevo_curso:
+        return jsonify({
+            "message": "Curso creado con éxito",
+            "id_curso": nuevo_curso.id_curso
+        }), 201
 
-            ruta_guardado = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            archivo.save(ruta_guardado)
+    return jsonify({"error": "No se pudo crear el curso"}), 500
 
-            RecursoDao.guardar_recurso(nombre_recurso, filename, descripcion, id_curso)
 
-            flash('Recurso guardado con éxito', 'success')
-            return redirect(url_for('docente.tablero_docente'))
-        else:
-            flash('Archivo no encontrado o inválido', 'danger')
-            return redirect(url_for('recursos.subir_recurso', id_curso=id_curso))
+@curso_bp.route('/cursos/docente/<int:id_docente>', methods=['GET'])
+def listar_cursos(id_docente):
+    cursos = CursoDao.obtener_cursos_por_docente(id_docente)
 
+    resultado = []
+    for c in cursos:
+        resultado.append({
+            "id_curso": c.id_curso,
+            "nombre": c.nombre_curso,
+            "nivel": c.nivel,
+            "descripcion": c.descripcion
+        })
+
+    return jsonify(resultado), 200
 
 

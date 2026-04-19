@@ -5,7 +5,7 @@ from dao.usuario_dao import UsuarioDao
 from models.curso import Curso
 from models.docente import Docente
 from models.idioma import Idioma
-from models.usuario import Usuario  # <-- NUEVO IMPORT
+from models.usuario import Usuario
 
 
 def test_crear_curso_exitoso(app, db):
