@@ -26,7 +26,7 @@ def iniciar_sesion():
             elif rol_validar == 'docente':
                 return redirect(url_for('docente.tablero_docente'))
             elif rol_validar == 'administrador':
-                return redirect(url_for('admin.tablero_admin'))
+                return redirect(url_for('admin.tablero_administrador'))
         else:
             flash("Usuario o contraseñas incorrectos. Intenta de nuevo")
             return redirect(url_for('auth.iniciar_sesion'))
