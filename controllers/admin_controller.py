@@ -11,3 +11,11 @@ def tablero_administrador():
         flash("Por favor, inicia sesión primero")
         return redirect(url_for('auth.iniciar_sesion'))
     return f"Bienvenido {nombre}"
+
+@admin_bp.route('/gestionar_docentes', methods=['GET'])
+def gestionar_docentes():
+    pass
+
+@admin_bp.route('/gestionar_alumnos', methods=['GET'])
+def gestionar_alumnos():
+    pass
