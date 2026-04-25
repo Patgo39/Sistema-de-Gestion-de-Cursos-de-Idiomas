@@ -35,7 +35,7 @@ class DocenteDao:
             raise Exception(f"Error al eliminar el docente con id : {id_docente}")
 
     @staticmethod
-    def actualizar_docente(id_docente: int, datos: dict[str, str]) -> Bool:
+    def actualizar_docente(id_docente: int, datos: dict[str, str]) -> None:
         """
         Se actualizan los datos el docente.
         NO se puede modificar el rol ni la última fecha de acceso.
