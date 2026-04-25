@@ -1,5 +1,6 @@
 from db import db
 from models.idioma import Idioma
+import unicodedata
 
 class IdiomaDao:
 
@@ -25,9 +26,14 @@ class IdiomaDao:
     @staticmethod
     def agregar_idioma(nombre_idioma:str) -> Idioma:
 
-        nombre_idioma = nombre_idioma.upper()
+        if nombre_idioma is None or nombre_idioma == "":
+            raise Exception(f"Nombre de idioma no válido.")
 
-        idioma  = Idioma.filter_by(nombre_idioma=nombre_idioma).first()
+
+        nombre_idioma1 = nombre_idioma.upper()
+        nombre_idioma = " ".join(nombre_idioma1.split())
+
+        idioma  = Idioma.query.filter_by(nombre_idioma=nombre_idioma).first()
 
         if idioma is None:
             idioma = Idioma(nombre_idioma=nombre_idioma)

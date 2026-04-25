@@ -1,28 +1,16 @@
 import pytest
-from app import app, db
-from models.usuario import Usuario
 from models.docente import Docente
 from models.manejar import Manejar
 from models.idioma import Idioma
+from dao.idioma_dao import IdiomaDao
+from models.usuario import Usuario
 from dao.docente_dao import DocenteDao
 from datetime import date
 
 class TestDocenteDao:
 
-    # Crea y elimina la BD provisional para los tests.
-    @pytest.fixture(autouse=True)
-    def config_test_db(self):
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        app.config['TESTING'] = True
-
-        with app.app_context():
-            db.create_all()
-            yield
-            db.session.remove()
-            db.drop_all()
-
     @pytest.fixture
-    def docente_test(self):
+    def docente_test(self, app, db):
         with app.app_context():
             usuario = Usuario(
                 username="testuser",
@@ -46,10 +34,12 @@ class TestDocenteDao:
                 especialidad="Lenguas extranjeras")
             db.session.add(docente)
             db.session.commit()
+            db.session.refresh(docente)
+            db.session.expunge(docente)
             return docente
 
 
-    def test_buscar_por_id(self, docente_test):
+    def test_buscar_por_id(self, app, docente_test):
         with app.app_context():
             id_erroneo = docente_test.id_usuario + 1
             docente = DocenteDao.buscar_por_id(id_erroneo)
@@ -63,7 +53,7 @@ class TestDocenteDao:
             assert docente.especialidad == "Lenguas extranjeras"
 
 
-    def test_actualizar_docente(self, docente_test):
+    def test_actualizar_docente(self, app, docente_test):
         with app.app_context():
             nuevos_datos = {
                 "nombre": "Pedro",
@@ -88,11 +78,38 @@ class TestDocenteDao:
                 assert docente_upd is not None
                 assert docente_upd.perfil_usuario.nombre == "Pedro"
                 assert docente_upd.perfil_usuario.username == "test_pedrito"
-                assert docente_upd.perfil_usuario.fecha_nacimiento == "1995-01-01"
-                assert docente_upd.perfil_usuario.rol != "Alumno"
+                assert docente_upd.perfil_usuario.fecha_nacimiento == date(1995, 1, 1)
+                assert docente_upd.perfil_usuario.rol == "Docente"
                 assert docente_upd.especialidad == "Traducción"
 
             except Exception as e:
                 assert False
+
+
+    def test_actualizar_idiomas(self, app, docente_test):
+        with app.app_context():
+
+            IdiomaDao.agregar_idioma("Inglés")
+            IdiomaDao.agregar_idioma("Francés")
+            IdiomaDao.agregar_idioma("Ruso")
+
+            id_docente = docente_test.id_usuario
+
+            idiomas = {
+                "Inglés" : "Avanzado",
+                "Francés" : "Básico"
+            }
+
+            DocenteDao.actualizar_lista_idiomas(id_docente, idiomas)
+
+            docente_upd = DocenteDao.buscar_por_id(id_docente)
+            idiomas_docente = docente_upd.idiomas_manejados.all()
+
+            assert idiomas_docente is not None
+            assert len(idiomas_docente) == 2
+            assert idiomas_docente[0].idioma.nombre_idioma == "INGLÉS"
+            assert idiomas_docente[0].nivel_dominio == "Avanzado"
+            assert idiomas_docente[1].idioma.nombre_idioma == "FRANCÉS"
+            assert idiomas_docente[1].nivel_dominio == "Básico"
 
 

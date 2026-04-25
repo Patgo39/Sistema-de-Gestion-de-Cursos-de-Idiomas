@@ -11,7 +11,7 @@ class DocenteDao:
 
     @staticmethod
     def buscar_por_id(id_docente: int) -> Docente:
-        docente = Docente.query.filter_by(id_docente=id_docente).first()
+        docente = Docente.query.filter_by(id_usuario=id_docente).first()
         return docente
 
     @staticmethod
@@ -21,7 +21,7 @@ class DocenteDao:
 
     @staticmethod
     def eliminar_docente(id_docente: int) -> Bool:
-        docente = Docente.query.get(id_docente)
+        docente = DocenteDao.buscar_por_id(id_docente)
 
         if not docente:
             raise Exception(f"No se encontró el docente con id : {id_docente}")
@@ -53,7 +53,7 @@ class DocenteDao:
             tiempo_experiencia
             especialidad
         """
-        docente = Docente.query.get(id_docente)
+        docente = DocenteDao.buscar_por_id(id_docente)
 
         if not docente:
             raise Exception(f"No se encontró el docente con id : {id_docente}")
@@ -88,7 +88,7 @@ class DocenteDao:
 
     @staticmethod
     def actualizar_ultimo_acceso(id_docente) -> None:
-        docente = Docente.query.get(id_docente)
+        docente = DocenteDao.buscar_por_id(id_docente)
         if not docente:
             raise Exception(f"No se encontró el docente con id : {id_docente}")
 
@@ -108,7 +108,7 @@ class DocenteDao:
         borrando o agregando idiomas.
         :param idiomas_input: Diccionario {'Ingles': 'Avanzado', 'Ruso': 'Básico'}
         """
-        docente = Docente.query.get(id_docente)
+        docente = DocenteDao.buscar_por_id(id_docente)
         if not docente:
             raise Exception(f"No se encontró el docente con id : {id_docente}")
 
@@ -129,7 +129,7 @@ class DocenteDao:
 
         try:
             # Se eliminan los idiomas sobrantes en la BD
-            ManejarDao.eliminar_relaciones(id_docente, list(a_borrar))
+            ManejarDao.eliminar_relaciones_por_ids(id_docente, list(a_borrar))
             # Se agregan los idiomas faltantes en la BD
             diccionario_agregar = {id_idm: datos_finales[id_idm] for id_idm in a_agregar}
             ManejarDao.agregar_relaciones(id_docente, diccionario_agregar)
