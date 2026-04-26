@@ -1,0 +1,29 @@
+<div class="dashboard-container">
+    <h1>Panel del Docente: {{ nombre }}</h1>
+    <nav>
+        <a href="#">Crear Nuevo Curso</a> |
+        <a href="{{ url_for('auth.cerrar_sesion') }}">Cerrar Sesión</a>
+    </nav>
+
+    <section>
+        <h2>Cursos que impartes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre del Curso</th>
+                    <th>Nivel</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for curso in cursos %}
+                <tr>
+                    <td>{{ curso.nombre_curso }}</td>
+                    <td>{{ curso.nivel }}</td>
+                    <td><a href="#">Gestionar</a> | <a href="#">Ver Alumnos</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>

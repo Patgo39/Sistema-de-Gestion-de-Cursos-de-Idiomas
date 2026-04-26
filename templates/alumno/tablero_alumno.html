@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Alumno</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}" />
+  <style>
+      .sidebar { padding: 20px; color: white; display: flex; flex-direction: column; gap: 20px; }
+      .sidebar a { color: white; text-decoration: none; font-weight: bold; padding: 10px; border-radius: 5px; }
+      .sidebar a:hover { background: rgba(255,255,255,0.2); }
+      .welcome-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2>Linguamail</h2>
+        <hr>
+        <a href="#">Mis Cursos</a>
+        <a href="#">Buscar Profesores</a>
+        <a href="#">Mi Perfil</a>
+        <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main" style="padding: 40px; align-items: flex-start; justify-content: flex-start;">
+      <div class="welcome-card" style="width: 100%;">
+        <h1>¡Bienvenido, {{ session['username'] }}!</h1>
+        <p>Has iniciado sesión como <strong>Alumno</strong>. Aquí podrás ver tus progresos.</p>
+
+        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3>0</h3>
+                <p>Cursos Activos</p>
+            </div>
+            <div style="background: #f1f8e9; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3>0</h3>
+                <p>Tareas Pendientes</p>
+            </div>
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3>A1</h3>
+                <p>Nivel Actual</p>
+            </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

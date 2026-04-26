@@ -4,6 +4,7 @@ from dao.usuario_dao import UsuarioDao
 from models.usuario import Usuario
 from models.alumno import Alumno
 from models.docente import Docente
+from models.administrador import Administrador
 
 def test_registrar_alumno_flujo_completo(app, db):
     with app.app_context():
@@ -33,7 +34,6 @@ def test_registrar_alumno_flujo_completo(app, db):
 
 def test_registrar_docente_exitoso(app, db):
     with app.app_context():
-        # Datos para el docente
         params = {
             "username": "profesor_x",
             "nombre": "Charles",
@@ -59,6 +59,31 @@ def test_registrar_docente_exitoso(app, db):
         assert d is not None
         assert d.especialidad == "Ingles"
         assert d.tiempo_experiencia == 20
+
+def test_registrar_administrador(app, db):
+    with app.app_context():
+        resultado = UsuarioDao.registrar_administrador(
+            username="admin_01",
+            nombre="Carlos",
+            apellido_paterno="Ruiz",
+            apellido_materno="Mora",
+            email="admin@test.com",
+            fecha_nacimiento=date(1980, 1, 15),
+            password="adminpass",
+            genero="Masculino",
+            pais="Argentina",
+            nivel_privilegio=1
+        )
+
+        assert resultado is True
+
+        usuario_db = Usuario.query.filter_by(username="admin_01").first()
+        assert usuario_db is not None
+        assert usuario_db.rol == 'administrador'
+
+        admin_db = Administrador.query.filter_by(id_usuario=usuario_db.id_usuario).first()
+        assert admin_db is not None
+        assert admin_db.nivel_privilegio == 1
 
 
 def test_verificar_login_exitoso(app, db):

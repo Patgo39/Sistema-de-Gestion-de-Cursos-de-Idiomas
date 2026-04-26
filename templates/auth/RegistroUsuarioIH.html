@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}" />
+  <style>
+      .hidden { display: none; }
+      .field select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2 style="color: white; padding: 20px;">Linguamail</h2>
+    </aside>
+
+    <main class="main">
+      <form class="card" action="{{ url_for('sign_up.registrar_usuario') }}" method="POST" style="max-width: 600px;">
+        <div class="card-header">
+          <h2>Crear cuenta</h2>
+          <p>Únete a nuestra comunidad de idiomas</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-message" style="padding: 12px; margin-bottom: 20px; border-radius: 10px; text-align: center; font-weight: bold;
+                {% if category == 'success' %} background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+                {% else %} background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; {% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="field"><label>Usuario</label><input type="text" name="username" placeholder="Tu usuario" required /></div>
+        <div class="field"><label>Contraseña</label><input type="password" name="password" placeholder="••••••••" required /></div>
+        <div class="field"><label>Nombre(s)</label><input type="text" name="nombre" required /></div>
+
+        <div style="display: flex; gap: 10px;">
+            <div class="field" style="flex: 1;"><label>Apellido Paterno</label><input type="text" name="apellido_paterno" required /></div>
+            <div class="field" style="flex: 1;"><label>Apellido Materno</label><input type="text" name="apellido_materno" required /></div>
+        </div>
+
+        <div class="field"><label>Correo Electrónico</label><input type="email" name="email" required /></div>
+        <div class="field"><label>Fecha de Nacimiento</label><input type="date" name="fecha_nacimiento" required /></div>
+
+        <div class="field">
+          <label>¿Qué quieres ser?</label>
+          <select name="rol" id="rol_selector" onchange="mostrarCamposDinamicos()" required>
+              <option value="" disabled selected>Selecciona un rol</option>
+              <option value="alumno">Alumno</option>
+              <option value="docente">Docente</option>
+          </select>
+        </div>
+
+        <div id="campos_alumno" class="hidden">
+            <div class="field"><label>Grado Actual</label><input type="text" name="grado_actual" id="grado_actual"></div>
+        </div>
+
+        <div id="campos_docente" class="hidden">
+            <div class="field"><label>Años de Experiencia</label><input type="number" name="tiempo_experiencia" id="tiempo_experiencia"></div>
+            <div class="field"><label>Especialidad</label><input type="text" name="especialidad" id="especialidad"></div>
+        </div>
+
+        <button class="btn" type="submit">Registrarme</button>
+        <p style="text-align: center; margin-top: 15px;">
+            <a href="{{ url_for('auth.iniciar_sesion') }}" style="color: #1e3c72; text-decoration: none;">¿Ya tienes cuenta? Entra aquí</a>
+        </p>
+      </form>
+    </main>
+  </div>
+
+  <script>
+      function mostrarCamposDinamicos() {
+          var rol = document.getElementById("rol_selector").value;
+          var divAlumno = document.getElementById("campos_alumno");
+          var divDocente = document.getElementById("campos_docente");
+
+          divAlumno.classList.add("hidden");
+          divDocente.classList.add("hidden");
+
+          if (rol === "alumno") {
+              divAlumno.classList.remove("hidden");
+          } else if (rol === "docente") {
+              divDocente.classList.remove("hidden");
+          }
+      }
+  </script>
+</body>
+</html>

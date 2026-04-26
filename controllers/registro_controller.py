@@ -8,7 +8,7 @@ registro_bp = Blueprint('sign_up', __name__)
 @registro_bp.route('/registro', methods=['GET', 'POST'])
 def registrar_usuario():
     if request.method == 'GET':
-        return render_template('RegistroUsuarioIH.html')
+        return render_template('auth/RegistroUsuarioIH.html')
 
     if request.method == 'POST':
         username = request.form.get('username')

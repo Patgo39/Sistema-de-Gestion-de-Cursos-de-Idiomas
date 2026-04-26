@@ -5,8 +5,8 @@ from dao.usuario_dao import UsuarioDao
 from models.curso import Curso
 from models.docente import Docente
 from models.idioma import Idioma
-from models.usuario import Usuario  # <-- NUEVO IMPORT
-
+from models.usuario import Usuario
+from models.inscribir import Inscribir
 
 def test_crear_curso_exitoso(app, db):
     with app.app_context():
@@ -90,3 +90,63 @@ def test_obtener_cursos_por_docente(app, db):
         assert len(cursos_laura) == 2
         assert cursos_laura[0].nombre_curso == "Italiano 1"
         assert cursos_laura[1].nombre_curso == "Italiano 2"
+
+
+def test_obtener_cursos_por_alumno(app, db):
+    with app.app_context():
+        UsuarioDao.registrar_docente(
+            username="profe_frances",
+            nombre="Julien",
+            apellido_paterno="Dupont",
+            apellido_materno="Lefevre",
+            email="julien@cursos.com",
+            fecha_nacimiento=date(1980, 5, 15),
+            password="123",
+            genero="Masculino",
+            pais="Francia",
+            tiempo_experiencia=8,
+            especialidad="Francés"
+        )
+        usuario_profe = Usuario.query.filter_by(username="profe_frances").first()
+
+        idioma_fra = Idioma(nombre_idioma="Francés")
+        db.session.add(idioma_fra)
+        db.session.commit()
+
+        curso1 = CursoDao.crear_curso(
+            nombre_curso="Francés A1", descripcion="Básico", nivel="A1",
+            id_usuario=usuario_profe.id_usuario, id_idioma=idioma_fra.id_idioma
+        )
+        curso2 = CursoDao.crear_curso(
+            nombre_curso="Francés A2", descripcion="Intermedio", nivel="A2",
+            id_usuario=usuario_profe.id_usuario, id_idioma=idioma_fra.id_idioma
+        )
+        curso_no_inscrito = CursoDao.crear_curso(
+            nombre_curso="Francés B1", descripcion="Avanzado", nivel="B1",
+            id_usuario=usuario_profe.id_usuario, id_idioma=idioma_fra.id_idioma
+        )
+        UsuarioDao.registrar_alumno(
+            username="alumno_test",
+            nombre="Ana",
+            apellido_paterno="López",
+            apellido_materno="Gómez",
+            email="ana@test.com",
+            fecha_nacimiento=date(2002, 10, 5),
+            password="123",
+            genero="Femenino",
+            pais="México",
+            grado_actual="Universidad"
+        )
+        usuario_alumno = Usuario.query.filter_by(username="alumno_test").first()
+
+        inscripcion1 = Inscribir(id_usuario=usuario_alumno.id_usuario, id_curso=curso1.id_curso)
+        inscripcion2 = Inscribir(id_usuario=usuario_alumno.id_usuario, id_curso=curso2.id_curso)
+        db.session.add_all([inscripcion1, inscripcion2])
+        db.session.commit()
+        cursos_alumno = CursoDao.obtener_cursos_por_alumno(usuario_alumno.id_usuario)
+        assert len(cursos_alumno) == 2, "El alumno debería estar inscrito exactamente en 2 cursos"
+        nombres_cursos_inscritos = [curso.nombre_curso for curso in cursos_alumno]
+
+        assert "Francés A1" in nombres_cursos_inscritos
+        assert "Francés A2" in nombres_cursos_inscritos
+        assert "Francés B1" not in nombres_cursos_inscritos, "El alumno no debería ver cursos en los que no se inscribió"

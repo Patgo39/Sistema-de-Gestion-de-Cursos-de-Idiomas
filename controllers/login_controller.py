@@ -17,21 +17,26 @@ def iniciar_sesion():
             session['usuario'] = usuario_valido.id_usuario
             session['username'] = usuario_valido.username
             session['rol'] = usuario_valido.rol
-
-
             rol_validar = usuario_valido.rol.lower()
 
             if rol_validar == 'alumno':
                 return redirect(url_for('alumno.tablero_alumno'))
             elif rol_validar == 'docente':
                 return redirect(url_for('docente.tablero_docente'))
+            elif rol_validar in ['admin', 'administrador']:
+                return redirect(url_for('administrador.tablero_admin'))
             else:
 
                 return redirect(url_for('index'))
         else:
 
-            flash("Usuario o contraseñas incorrectos. Intenta de nuevo")
+            flash("Usuario o contraseñas incorrectos. Intenta de nuevo", "error")
             return redirect(url_for('auth.iniciar_sesion'))
+@login_bp.route('/logout')
+def cerrar_sesion():
+    session.clear()
+    flash("Has cerrado sesión exitosamente.")
+    return redirect(url_for('auth.iniciar_sesion'))
 
 
 
