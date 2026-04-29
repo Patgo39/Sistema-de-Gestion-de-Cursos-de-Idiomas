@@ -1,11 +1,13 @@
 from uno import Bool
 from datetime import datetime
+from datetime import date
 from db import db
 from models.docente import Docente
 from models.manejar import Manejar
 from models.idioma import Idioma
 from dao.idioma_dao import IdiomaDao
 from dao.manejar_dao import ManejarDao
+
 
 class DocenteDao:
 
@@ -94,7 +96,7 @@ class DocenteDao:
 
         usuario = docente.perfil_usuario
 
-        usuario.ultima_fecha_acceso = datetime.now()
+        usuario.ultima_fecha_acceso = date.today()
         try:
             db.session.commit()
         except Exception as e:

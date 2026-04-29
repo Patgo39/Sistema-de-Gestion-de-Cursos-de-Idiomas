@@ -95,13 +95,14 @@ class TestDocenteDao:
 
             id_docente = docente_test.id_usuario
 
+
+            # Agregar idiomas
             idiomas = {
                 "Inglés" : "Avanzado",
                 "Francés" : "Básico"
             }
 
             DocenteDao.actualizar_lista_idiomas(id_docente, idiomas)
-
             docente_upd = DocenteDao.buscar_por_id(id_docente)
             idiomas_docente = docente_upd.idiomas_manejados.all()
 
@@ -112,4 +113,51 @@ class TestDocenteDao:
             assert idiomas_docente[1].idioma.nombre_idioma == "FRANCÉS"
             assert idiomas_docente[1].nivel_dominio == "Básico"
 
+            #Actualizar idiomas
+            idiomas.update({"Ruso" : "Básico"})
 
+            DocenteDao.actualizar_lista_idiomas(id_docente, idiomas)
+            docente_upd = DocenteDao.buscar_por_id(id_docente)
+            idiomas_docente = docente_upd.idiomas_manejados.all()
+
+            assert idiomas_docente is not None
+            assert len(idiomas_docente) == 3
+            assert idiomas_docente[0].idioma.nombre_idioma == "INGLÉS"
+            assert idiomas_docente[0].nivel_dominio == "Avanzado"
+            assert idiomas_docente[1].idioma.nombre_idioma == "FRANCÉS"
+            assert idiomas_docente[1].nivel_dominio == "Básico"
+            assert idiomas_docente[2].idioma.nombre_idioma == "RUSO"
+            assert idiomas_docente[2].nivel_dominio == "Básico"
+
+            #Eliminar idiomas
+            idiomas = {
+                "Inglés": "Avanzado",
+                "Ruso": "Básico"
+            }
+
+            DocenteDao.actualizar_lista_idiomas(id_docente, idiomas)
+            docente_upd = DocenteDao.buscar_por_id(id_docente)
+            idiomas_docente = docente_upd.idiomas_manejados.all()
+
+            assert idiomas_docente is not None
+            assert len(idiomas_docente) == 2
+            assert idiomas_docente[0].idioma.nombre_idioma == "INGLÉS"
+            assert idiomas_docente[0].nivel_dominio == "Avanzado"
+            assert idiomas_docente[1].idioma.nombre_idioma == "RUSO"
+            assert idiomas_docente[1].nivel_dominio == "Básico"
+
+    def test_actualizar_ultimo_acceso(self, app, docente_test):
+        with app.app_context():
+            DocenteDao.actualizar_ultimo_acceso(docente_test.id_usuario)
+            docente_upd = DocenteDao.buscar_por_id(docente_test.id_usuario)
+            assert docente_upd.perfil_usuario.ultima_fecha_acceso.date() == date.today()
+
+    def test_eliminar_docente(self, app, docente_test):
+        with app.app_context():
+            id_docente = docente_test.id_usuario
+
+            valor = DocenteDao.eliminar_docente(id_docente)
+
+            docente_upd = DocenteDao.buscar_por_id(id_docente)
+
+            assert docente_upd is None
