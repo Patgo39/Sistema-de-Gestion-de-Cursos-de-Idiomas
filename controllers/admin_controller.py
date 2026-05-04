@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for
+from dao.alumno_dao import AlumnoDao
+from dao.docente_dao import DocenteDao
 
 admin_bp = Blueprint('admin', __name__)
 
