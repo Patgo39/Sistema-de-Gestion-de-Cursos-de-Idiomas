@@ -3,8 +3,6 @@ from datetime import datetime
 from datetime import date
 from db import db
 from models.docente import Docente
-from models.manejar import Manejar
-from models.idioma import Idioma
 from dao.idioma_dao import IdiomaDao
 from dao.manejar_dao import ManejarDao
 
@@ -104,7 +102,7 @@ class DocenteDao:
             raise e
 
     @staticmethod
-    def actualizar_lista_idiomas(id_docente: int, idiomas_input: dict[str, str]):
+    def actualizar_lista_idiomas(id_docente: int, idiomas_input: dict[str, str]) -> None:
         """
         Recibe un diccionario de idioma, nivel y se compara con la lista actual de idiomas
         borrando o agregando idiomas.
