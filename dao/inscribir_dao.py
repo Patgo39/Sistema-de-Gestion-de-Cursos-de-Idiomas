@@ -51,7 +51,7 @@ class InscribirDao:
                                        .join(Inscribir, Inscribir.id_usuario == Alumno.id_usuario)
                                        .filter(Inscribir.id_curso == id_curso)
                                        .all())
-            return [{"nombre_completo": f"{alumno.nombre} {alumno.apellido_paterno} {alumno.apellido_materno}"
+            return [{"nombre_completo": f"{alumno.apellido_paterno} {alumno.apellido_materno} {alumno.nombre}"
                      } for alumno in lista_alumnos_inscritos]
         except Exception as e:
             db.session.rollback()
