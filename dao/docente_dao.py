@@ -3,6 +3,7 @@ from datetime import datetime
 from datetime import date
 from db import db
 from models.docente import Docente
+from models.usuario import Usuario
 from dao.idioma_dao import IdiomaDao
 from dao.manejar_dao import ManejarDao
 
@@ -138,3 +139,43 @@ class DocenteDao:
         except Exception as e:
             db.session.rollback()
             raise e
+
+
+
+    @staticmethod
+    def buscar_por_atributos(filtros:dict[str, str]) -> list[Docente]:
+        """
+        Se puede consultar por:
+        id_usuario
+        username
+        nombre
+        apellido_paterno
+        apellido_materno
+        email
+        genero
+        pais
+        fecha_nacimiento
+        ultima_fecha_acceso
+        tiempo_experiencia
+        especialidad
+        """
+
+        query = Docente.query.join(Usuario, Docente.id_usuario == Usuario.id_usuario)
+
+        campos_docente = ['tiempo_experiencia', 'especialidad']
+
+        campos_usuario = [
+            'id_usuario', 'username', 'nombre', 'apellido_paterno',
+            'apellido_materno', 'email', 'genero', 'pais',
+            'fecha_nacimiento', 'ultima_fecha_acceso'
+        ]
+
+        for clave, valor in filtros.items():
+            if valor:
+                if clave in campos_docente:
+                    query = query.filter(getattr(Docente, clave) == valor)
+
+                elif clave in campos_usuario:
+                    query = query.filter(getattr(Usuario, clave) == valor)
+
+        return query.all()

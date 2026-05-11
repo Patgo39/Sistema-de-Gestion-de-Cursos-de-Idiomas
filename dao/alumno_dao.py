@@ -2,6 +2,7 @@ from uno import Bool
 from datetime import datetime
 from datetime import date
 from db import db
+from models import Docente
 from models.alumno import Alumno
 from dao.idioma_dao import IdiomaDao
 from dao.dominar_dao import DominarDao
@@ -135,3 +136,21 @@ class AlumnoDao:
         except Exception as e:
             db.session.rollback()
             raise e
+
+    @staticmethod
+    def buscar_por_atributos(filtros:dict[str, str]) -> list[Alumno]:
+        """
+        Se puede consultar por:
+        id_usuario
+        username
+        nombre
+        apellido_paterno
+        apellido_materno
+        email
+        genero
+        pais
+        fecha_nacimiento
+        ultima_fecha_acceso
+        grado_actual
+        """
+
