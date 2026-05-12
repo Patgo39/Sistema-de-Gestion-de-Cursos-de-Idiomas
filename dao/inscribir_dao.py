@@ -7,7 +7,7 @@ class InscribirDao:
     @staticmethod
     def crear_inscripcion(id_usuario, id_curso):
         try:
-            nueva_inscripcion = Inscribir(id_usuario=id_usuario, id_curso=id_curso)
+            nueva_inscripcion = Inscribir(id_alumno=id_usuario, id_curso=id_curso)
 
             db.session.add(nueva_inscripcion)
             db.session.commit()
@@ -26,8 +26,8 @@ class InscribirDao:
                                                 Usuario.genero,
                                                 Alumno.grado_actual)
                             .join(Alumno, Alumno.id_usuario == Usuario.id_usuario)
-                            .join(Inscribir, Inscribir.id_usuario == Alumno.id_usuario)
-                            .filter(Inscribir.id_curso == id_curso, Inscribir.id_usuario == id_usuario)
+                            .join(Inscribir, Inscribir.id_alumno == Alumno.id_usuario)
+                            .filter(Inscribir.id_curso == id_curso, Inscribir.id_alumno == id_usuario)
                             .first())
             if datos_alumno:
                 return {
@@ -46,12 +46,12 @@ class InscribirDao:
     @staticmethod
     def consultar_lista_inscripcion(id_curso):
         try:
-            lista_alumnos_inscritos = (db.session.query(Usuario.apellido_paterno, Usuario.apellido_materno, Usuario.nombre)
+            lista_alumnos_inscritos = (db.session.query(Usuario.id_usuario, Usuario.apellido_paterno, Usuario.apellido_materno, Usuario.nombre)
                                        .join(Alumno, Alumno.id_usuario == Usuario.id_usuario)
-                                       .join(Inscribir, Inscribir.id_usuario == Alumno.id_usuario)
+                                       .join(Inscribir, Inscribir.id_alumno == Alumno.id_usuario)
                                        .filter(Inscribir.id_curso == id_curso)
                                        .all())
-            return [{"nombre_completo": f"{alumno.apellido_paterno} {alumno.apellido_materno} {alumno.nombre}"
+            return [{"id_usuario": alumno.id_usuario, "nombre_completo": f"{alumno.apellido_paterno} {alumno.apellido_materno} {alumno.nombre}"
                      } for alumno in lista_alumnos_inscritos]
         except Exception as e:
             db.session.rollback()
@@ -62,7 +62,7 @@ class InscribirDao:
     @staticmethod
     def eliminar_inscripcion(id_usuario, id_curso):
         try:
-            inscripcion = Inscribir.query.filter_by(id_usuario = id_usuario, id_curso = id_curso).first()
+            inscripcion = Inscribir.query.filter_by(id_alumno = id_usuario, id_curso = id_curso).first()
             if inscripcion:
                 db.session.delete(inscripcion)
                 db.session.commit()

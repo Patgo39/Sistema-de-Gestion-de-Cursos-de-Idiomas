@@ -106,18 +106,18 @@ class TestInscribirDao:
             InscribirDao.crear_inscripcion(alumno.id_usuario, curso.id_curso)
 
             inscripcion = Inscribir.query.filter_by(
-                id_usuario=alumno.id_usuario,
+                id_alumno=alumno.id_usuario,
                 id_curso=curso.id_curso
             ).first()
             assert inscripcion is not None
-            assert inscripcion.id_usuario == alumno.id_usuario
+            assert inscripcion.id_alumno == alumno.id_usuario
             assert inscripcion.id_curso == curso.id_curso
 
             # caso consultar que un alumno no tenga doble inscripcion al mismo curso
             InscribirDao.crear_inscripcion(alumno.id_usuario, curso.id_curso)
 
             inscripciones = Inscribir.query.filter_by(
-                id_usuario=alumno.id_usuario,
+                id_alumno=alumno.id_usuario,
                 id_curso=curso.id_curso
             ).all()
             assert len(inscripciones) == 1
@@ -161,6 +161,10 @@ class TestInscribirDao:
             assert "Perez Alcantara Juan" in nombres
             assert "Perez Alcantara Juana" in nombres
 
+            ids = [a["id_usuario"] for a in lista]
+            assert alumno1.id_usuario in ids
+            assert alumno2.id_usuario in ids
+
     def test_eliminar_inscripcion(self, app,inscribir_test):
         alumno = inscribir_test["alumno1"]
         curso = inscribir_test["curso"]
@@ -178,7 +182,7 @@ class TestInscribirDao:
 
             #revisar en bd que no siga inscrito
             inscripcion = Inscribir.query.filter_by(
-                id_usuario=alumno.id_usuario,
+                id_alumno=alumno.id_usuario,
                 id_curso=curso.id_curso
             ).first()
             assert inscripcion is None
