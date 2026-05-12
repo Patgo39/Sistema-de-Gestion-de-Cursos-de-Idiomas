@@ -43,7 +43,7 @@ def visualizar_docentes():
 
     return lista_docentes
 @admin_bp.route('/gestionar_docentes/<id_usuario>', methods=['GET', 'POST'])
-def gestionar_docente(id_usuario):
+def gestionar_docentes(id_usuario):
     if request.method == 'GET':
         d = DocenteDao.buscar_por_id(id_usuario)
 
@@ -70,74 +70,89 @@ def gestionar_docente(id_usuario):
     elif request.method == 'POST':
         llaves = [
             "username", "nombre", "apellido_paterno", "apellido_materno",
-            "email", "password", "genero", "pais", "fecha_nacimiento", "ultima_fecha_acceso",
+            "email", "password", "genero", "pais", "fecha_nacimiento",
             "tiempo_experiencia", "especialidad"
         ]
 
+        datos_entrada = request.get_json() if request.is_json else request.form
+
+        if not datos_entrada:
+            return redirect(url_for('admin.gestionar_docentes', id_usuario=id_usuario))
+
         docente_dict = {
-            k : request.form.get(k)
+            k : datos_entrada.get(k)
             for k in llaves
-            if request.form.get(k)
+            if datos_entrada.get(k)
         }
 
-        if "fecha_nacimiento" in docente_dict:
-            try:
+
+        try:
+            if "fecha_nacimiento" in docente_dict:
                 datetime.strptime(docente_dict["fecha_nacimiento"], "%Y-%m-%d")
-                if "ultima_fecha_acceso" in docente_dict:
-                    datetime.strptime(docente_dict["ultima_fecha_acceso"], "%Y-%m-%d")
-                DocenteDao.actualizar_docente(id_usuario, docente_dict)
-                flash("Datos actualizados correctamente")
-                return redirect(url_for(f'admin_bp.gestionar_docente/{id_usuario}'))
-            except ValueError:
-                flash("Error: El formato de fecha debe ser YYYY-MM-DD")
-                return redirect(url_for('admin_bg.gestionar_docente'))
+        except ValueError:
+            flash("Error: El formato de fecha debe ser YYYY-MM-DD")
+            return redirect(url_for('admin.gestionar_docentes'))
+
+        try:
+            DocenteDao.actualizar_docente(id_usuario, docente_dict)
+            flash("Datos actualizados correctamente")
+            return redirect(url_for('admin.gestionar_docentes', id_usuario=id_usuario))
+        except Exception as e:
+            msg = str(e)
+            flash(f"Error: {msg}")
+            return redirect(url_for('admin.gestionar_docentes', id_usuario=id_usuario))
+
 
 @admin_bp.route('/consultar_docentes', methods=['POST'])
 def consultar_docentes():
     llaves = [
         "id_usuario", "username", "nombre", "apellido_paterno", "apellido_materno",
-        "email", "password", "genero", "pais", "fecha_nacimiento", "ultima_fecha_acceso",
+        "email", "genero", "pais", "fecha_nacimiento", "ultima_fecha_acceso",
         "tiempo_experiencia", "especialidad"
     ]
 
+    datos_entrada = request.get_json() if request.is_json else request.form
+    if not datos_entrada:
+        return redirect(url_for('admin.consultar_docente'))
+
     docente_dict = {
-        k: request.form.get(k)
+        k: datos_entrada.get(k)
         for k in llaves
-        if request.form.get(k)
+        if datos_entrada.get(k)
     }
 
-    if "fecha_nacimiento" in docente_dict:
-        try:
+    try:
+        if "fecha_nacimiento" in docente_dict:
             datetime.strptime(docente_dict["fecha_nacimiento"], "%Y-%m-%d")
-            if "ultima_fecha_acceso" in docente_dict:
-                datetime.strptime(docente_dict["ultima_fecha_acceso"], "%Y-%m-%d")
-            lista_docentes = DocenteDao.buscar_por_atributos(docente_dict)
+        if "ultima_fecha_acceso" in docente_dict:
+            datetime.strptime(docente_dict["ultima_fecha_acceso"], "%Y-%m-%d")
 
-            docentes_json = [
-                {
-                    "id_usuario": d.id_usuario,
-                    "username": d.perfil_usuario.username,
-                    "nombre": d.perfil_usuario.nombre,
-                    "apellido_paterno": d.perfil_usuario.apellido_paterno,
-                    "apellido_materno": d.perfil_usuario.apellido_materno,
-                    "email": d.perfil_usuario.email,
-                    "genero": d.perfil_usuario.genero,
-                    "pais": d.perfil_usuario.pais,
-                    "fecha_nacimiento": d.perfil_usuario.fecha_nacimiento.strftime(
-                        "%Y-%m-%d") if d.perfil_usuario.fecha_nacimiento else None,
-                    "ultima_fecha_acceso": d.perfil_usuario.ultima_fecha_acceso.strftime(
-                        "%Y-%m-%d") if d.perfil_usuario.ultima_fecha_acceso else None,
-                    "tiempo_experiencia": d.tiempo_experiencia,
-                    "especialidad": d.especialidad
-                } for d in lista_docentes
-            ]
-            flash("Datos actualizados correctamente")
-            return jsonify(docentes_json)
-        except ValueError:
-            flash("Error: El formato de fecha debe ser YYYY-MM-DD")
-            return redirect(url_for('admin_bg.conultar_docentes'))
+    except ValueError:
+        flash("Error: El formato de fecha debe ser YYYY-MM-DD")
+        return redirect(url_for('admin_bg.conultar_docentes'))
 
+    lista_docentes = DocenteDao.buscar_por_atributos(docente_dict)
 
+    docentes_json = [
+        {
+            "id_usuario": d.id_usuario,
+            "username": d.perfil_usuario.username,
+            "nombre": d.perfil_usuario.nombre,
+            "apellido_paterno": d.perfil_usuario.apellido_paterno,
+            "apellido_materno": d.perfil_usuario.apellido_materno,
+            "email": d.perfil_usuario.email,
+            "genero": d.perfil_usuario.genero,
+            "pais": d.perfil_usuario.pais,
+            "fecha_nacimiento": d.perfil_usuario.fecha_nacimiento.strftime(
+                "%Y-%m-%d") if d.perfil_usuario.fecha_nacimiento else None,
+            "ultima_fecha_acceso": d.perfil_usuario.ultima_fecha_acceso.strftime(
+                "%Y-%m-%d") if d.perfil_usuario.ultima_fecha_acceso else None,
+            "tiempo_experiencia": d.tiempo_experiencia,
+            "especialidad": d.especialidad
+        } for d in lista_docentes
+    ]
+    flash("Datos actualizados correctamente")
+    return jsonify(docentes_json)
 
 @admin_bp.route('/gestionar_alumnos', methods=['GET'])
 def visualizar_alumnos():
@@ -164,7 +179,7 @@ def visualizar_alumnos():
     return jsonify(alumnos_json)
 
 @admin_bp.route('/gestionar_alumnos/<id_usuario>', methods=['GET', 'POST'])
-def gestionar_alumno(id_usuario):
+def gestionar_alumnos(id_usuario):
     if request.method == 'GET':
         a = AlumnoDao.buscar_por_id(id_usuario)
 
@@ -190,71 +205,91 @@ def gestionar_alumno(id_usuario):
     elif request.method == 'POST':
         llaves = [
             "username", "nombre", "apellido_paterno", "apellido_materno",
-            "email", "password", "genero", "pais", "fecha_nacimiento", "ultima_fecha_acceso",
+            "email", "password", "genero", "pais", "fecha_nacimiento",
             "grado_actual"
         ]
 
+        datos_entrada = request.get_json() if request.is_json else request.form
+        if not datos_entrada:
+            return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
+
         alumno_dict = {
-            k: request.form.get(k)
+            k: datos_entrada.get(k)
             for k in llaves
-            if request.form.get(k)
+            if datos_entrada.get(k)
         }
 
-        if "fecha_nacimiento" in alumno_dict:
-            try:
-                datetime.strptime(alumno_dict["fecha_nacimiento"], "%Y-%m-%d")
-                if "ultima_fecha_acceso" in alumno_dict:
-                    datetime.strptime(alumno_dict["ultima_fecha_acceso"], "%Y-%m-%d")
-                AlumnoDao.actualizar_alumno(id_usuario, alumno_dict)
-                flash("Datos actualizados correctamente")
-            except ValueError:
-                flash("Error: El formato de fecha debe ser YYYY-MM-DD")
-                return redirect(url_for('admin_bg.gestionar_alumno'))
 
+        try:
+            if "fecha_nacimiento" in alumno_dict:
+                datetime.strptime(alumno_dict["fecha_nacimiento"], "%Y-%m-%d")
+        except ValueError:
+            flash("Error: El formato de fecha debe ser YYYY-MM-DD")
+            return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
+
+        try:
+            AlumnoDao.actualizar_alumno(id_usuario, alumno_dict)
+            flash("Datos actualizados correctamente")
+            return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
+        except Exception as e:
+            msg = str(e)
+            flash(f"Error: {msg}")
+            return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
 
 
 @admin_bp.route('/consultar_alumnos', methods=['POST'])
 def consultar_alumnos():
     llaves = [
         "id_usuario", "username", "nombre", "apellido_paterno", "apellido_materno",
-        "email", "password", "genero", "pais", "fecha_nacimiento", "ultima_fecha_acceso",
+        "email", "genero", "pais", "fecha_nacimiento", "ultima_fecha_acceso",
         "grado_actual"
     ]
 
+    datos_entrada = request.get_json() if request.is_json else request.form
+    if not datos_entrada:
+        return redirect(url_for('admin.consultar_alumnos'))
+
     alumno_dict = {
-        k: request.form.get(k)
+        k: datos_entrada.get(k)
         for k in llaves
-        if request.form.get(k)
+        if datos_entrada.get(k)
     }
 
-    if "fecha_nacimiento" in alumno_dict:
-        try:
+
+    try:
+        if "fecha_nacimiento" in alumno_dict:
             datetime.strptime(alumno_dict["fecha_nacimiento"], "%Y-%m-%d")
-            if "ultima_fecha_acceso" in alumno_dict:
-                datetime.strptime(alumno_dict["ultima_fecha_acceso"], "%Y-%m-%d")
-            lista_alumnos = AlumnoDao.buscar_por_atributos(alumno_dict)
+        if "ultima_fecha_acceso" in alumno_dict:
+            datetime.strptime(alumno_dict["ultima_fecha_acceso"], "%Y-%m-%d")
 
-            alumnos_json = [
-                {
-                    "id_usuario": a.id_usuario,
-                    "username": a.perfil_usuario.username,
-                    "nombre": a.perfil_usuario.nombre,
-                    "apellido_paterno": a.perfil_usuario.apellido_paterno,
-                    "apellido_materno": a.perfil_usuario.apellido_materno,
-                    "email": a.perfil_usuario.email,
-                    "genero": a.perfil_usuario.genero,
-                    "pais": a.perfil_usuario.pais,
-                    "fecha_nacimiento": a.perfil_usuario.fecha_nacimiento.strftime(
-                        "%Y-%m-%d") if a.perfil_usuario.fecha_nacimiento else None,
-                    "ultima_fecha_acceso": a.perfil_usuario.ultima_fecha_acceso.strftime(
-                        "%Y-%m-%d") if a.perfil_usuario.ultima_fecha_acceso else None,
-                    "grado_actual": a.grado_actual
-                } for a in lista_alumnos
-            ]
+    except ValueError:
+        flash("Error: El formato de fecha debe ser YYYY-MM-DD")
+        return redirect(url_for('admin.conultar_alumnos'))
 
-            flash("Datos actualizados correctamente")
-            return jsonify(alumnos_json)
+    try:
+        lista_alumnos = AlumnoDao.buscar_por_atributos(alumno_dict)
 
-        except ValueError:
-            flash("Error: El formato de fecha debe ser YYYY-MM-DD")
-            return redirect(url_for('admin_bg.conultar_alumnos'))
+        alumnos_json = [
+            {
+                "id_usuario": a.id_usuario,
+                "username": a.perfil_usuario.username,
+                "nombre": a.perfil_usuario.nombre,
+                "apellido_paterno": a.perfil_usuario.apellido_paterno,
+                "apellido_materno": a.perfil_usuario.apellido_materno,
+                "email": a.perfil_usuario.email,
+                "genero": a.perfil_usuario.genero,
+                "pais": a.perfil_usuario.pais,
+                "fecha_nacimiento": a.perfil_usuario.fecha_nacimiento.strftime(
+                    "%Y-%m-%d") if a.perfil_usuario.fecha_nacimiento else None,
+                "ultima_fecha_acceso": a.perfil_usuario.ultima_fecha_acceso.strftime(
+                    "%Y-%m-%d") if a.perfil_usuario.ultima_fecha_acceso else None,
+                "grado_actual": a.grado_actual
+            } for a in lista_alumnos
+        ]
+
+        flash("Datos actualizados correctamente")
+        return jsonify(alumnos_json)
+    except Exception as e:
+        msg = str(e)
+        flash(f"Error: {msg}")
+        return redirect(url_for('admin.conultar_alumnos'))
