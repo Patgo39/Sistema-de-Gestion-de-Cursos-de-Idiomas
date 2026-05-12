@@ -152,6 +152,36 @@ class TestDocenteDao:
             docente_upd = DocenteDao.buscar_por_id(docente_test.id_usuario)
             assert docente_upd.perfil_usuario.ultima_fecha_acceso.date() == date.today()
 
+    def test_buscar_por_atributos(self, app, docente_test):
+        with app.app_context():
+            filtros_nombre = {"nombre": "Juan"}
+            resultados = DocenteDao.buscar_por_atributos(filtros_nombre)
+            assert len(resultados) >= 1
+            assert resultados[0].perfil_usuario.nombre == "Juan"
+
+            filtros_esp = {"especialidad": "Lenguas extranjeras"}
+            resultados = DocenteDao.buscar_por_atributos(filtros_esp)
+            assert len(resultados) >= 1
+            assert resultados[0].especialidad == "Lenguas extranjeras"
+
+            filtros_comb = {
+                "pais": "México",
+                "tiempo_experiencia": 8
+            }
+            resultados = DocenteDao.buscar_por_atributos(filtros_comb)
+            assert len(resultados) >= 1
+            assert resultados[0].perfil_usuario.pais == "México"
+            assert resultados[0].tiempo_experiencia == 8
+
+            filtros_vacios = {"nombre": "NombreInexistente"}
+            resultados = DocenteDao.buscar_por_atributos(filtros_vacios)
+            assert len(resultados) == 0
+
+            filtros_id = {"id_usuario": docente_test.id_usuario}
+            resultados = DocenteDao.buscar_por_atributos(filtros_id)
+            assert len(resultados) == 1
+            assert resultados[0].id_usuario == docente_test.id_usuario
+
     def test_eliminar_docente(self, app, docente_test):
         with app.app_context():
             id_docente = docente_test.id_usuario

@@ -152,6 +152,37 @@ class TestAlumnoDao:
             alumno_upd = AlumnoDao.buscar_por_id(alumno_test.id_usuario)
             assert alumno_upd.perfil_usuario.ultima_fecha_acceso.date() == date.today()
 
+    def test_buscar_por_atributos(self, app, alumno_test):
+        with app.app_context():
+
+            filtros_nombre = {"nombre": "Juan"}
+            resultados = AlumnoDao.buscar_por_atributos(filtros_nombre)
+            assert len(resultados) >= 1
+            assert resultados[0].perfil_usuario.nombre == "Juan"
+
+            filtros_grado = {"grado_actual": "Tercero Preparatoria"}
+            resultados = AlumnoDao.buscar_por_atributos(filtros_grado)
+            assert len(resultados) >= 1
+            assert resultados[0].grado_actual == "Tercero Preparatoria"
+
+            filtros_comb = {
+                "pais": "México",
+                "grado_actual": "Tercero Preparatoria"
+            }
+            resultados = AlumnoDao.buscar_por_atributos(filtros_comb)
+            assert len(resultados) >= 1
+            assert resultados[0].perfil_usuario.pais == "México"
+            assert resultados[0].grado_actual == "Tercero Preparatoria"
+
+            filtros_vacios = {"nombre": "NombreInexistente"}
+            resultados = AlumnoDao.buscar_por_atributos(filtros_vacios)
+            assert len(resultados) == 0
+
+            filtros_id = {"id_usuario": alumno_test.id_usuario}
+            resultados = AlumnoDao.buscar_por_atributos(filtros_id)
+            assert len(resultados) == 1
+            assert resultados[0].id_usuario == alumno_test.id_usuario
+
     def test_eliminar_alumno(self, app, alumno_test):
         with app.app_context():
             id_alumno = alumno_test.id_usuario
@@ -161,3 +192,4 @@ class TestAlumnoDao:
             alumno_upd = AlumnoDao.buscar_por_id(id_alumno)
 
             assert alumno_upd is None
+

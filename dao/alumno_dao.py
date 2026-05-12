@@ -4,6 +4,7 @@ from datetime import date
 from db import db
 from models import Docente
 from models.alumno import Alumno
+from models.usuario import Usuario
 from dao.idioma_dao import IdiomaDao
 from dao.dominar_dao import DominarDao
 
@@ -153,4 +154,23 @@ class AlumnoDao:
         ultima_fecha_acceso
         grado_actual
         """
+        query = Alumno.query.join(Usuario, Alumno.id_usuario == Usuario.id_usuario)
+
+        campos_alumno = ['grado_actual']
+
+        campos_usuario = [
+            'id_usuario', 'username', 'nombre', 'apellido_paterno',
+            'apellido_materno', 'email', 'genero', 'pais',
+            'fecha_nacimiento', 'ultima_fecha_acceso'
+        ]
+
+        for clave, valor in filtros.items():
+            if valor:
+                if clave in campos_alumno:
+                    query = query.filter(getattr(Alumno, clave) == valor)
+
+                elif clave in campos_usuario:
+                    query = query.filter(getattr(Usuario, clave) == valor)
+
+        return query.all()
 
