@@ -154,8 +154,10 @@ class DocenteDao:
         email
         genero
         pais
-        fecha_nacimiento
-        ultima_fecha_acceso
+        fecha_nacimiento_min
+        fecha_nacimiento_max
+        ultima_fecha_acceso_min
+        ultima_fecha_acceso_max
         tiempo_experiencia
         especialidad
         """
@@ -166,16 +168,27 @@ class DocenteDao:
 
         campos_usuario = [
             'id_usuario', 'username', 'nombre', 'apellido_paterno',
-            'apellido_materno', 'email', 'genero', 'pais',
-            'fecha_nacimiento', 'ultima_fecha_acceso'
+            'apellido_materno', 'email', 'genero', 'pais'
         ]
 
         for clave, valor in filtros.items():
-            if valor:
-                if clave in campos_docente:
-                    query = query.filter(getattr(Docente, clave) == valor)
+            if not valor:
+                continue
 
-                elif clave in campos_usuario:
-                    query = query.filter(getattr(Usuario, clave) == valor)
+            if clave == 'fecha_nacimiento_min':
+                query.filter(Usuario.fecha_nacimiento >= valor)
+            if clave == 'fecha_nacimiento_max':
+                query.filter(Usuario.fecha_nacimiento <= valor)
+
+            if clave == 'ultima_fecha_acceso_min':
+                query.filter(Usuario.ultima_fecha_acceso >= valor)
+            if clave == 'ultima_fecha_acceso_max':
+                query.filter(Usuario.ultima_fecha_acceso <= valor)
+
+            if clave in campos_docente:
+                query = query.filter(getattr(Docente, clave) == valor)
+
+            elif clave in campos_usuario:
+                query = query.filter(getattr(Usuario, clave) == valor)
 
         return query.all()

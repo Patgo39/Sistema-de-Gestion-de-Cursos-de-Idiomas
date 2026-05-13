@@ -1,3 +1,5 @@
+from getopt import error
+
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for, jsonify
 from dao.alumno_dao import AlumnoDao
 from dao.docente_dao import DocenteDao
@@ -107,13 +109,15 @@ def gestionar_docentes(id_usuario):
 def consultar_docentes():
     llaves = [
         "id_usuario", "username", "nombre", "apellido_paterno", "apellido_materno",
-        "email", "genero", "pais", "fecha_nacimiento", "ultima_fecha_acceso",
+        "email", "genero", "pais", "fecha_nacimiento_min", "fecha_nacimiento_max",
+        "ultima_fecha_acceso_min", "ultima_fecha_acceso_max"
         "tiempo_experiencia", "especialidad"
     ]
 
     datos_entrada = request.get_json() if request.is_json else request.form
     if not datos_entrada:
-        return redirect(url_for('admin.consultar_docente'))
+        flash("Error: Formato de datos incorrecto", category="error")
+        return redirect(url_for('admin.consultar_docentes'))
 
     docente_dict = {
         k: datos_entrada.get(k)
@@ -121,14 +125,18 @@ def consultar_docentes():
         if datos_entrada.get(k)
     }
 
+    llaves_fecha = [
+        "fecha_nacimiento_min", "fecha_nacimiento_max",
+        "ultima_fecha_acceso_min", "ultima_fecha_acceso_max"
+    ]
+
     try:
-        if "fecha_nacimiento" in docente_dict:
-            datetime.strptime(docente_dict["fecha_nacimiento"], "%Y-%m-%d")
-        if "ultima_fecha_acceso" in docente_dict:
-            datetime.strptime(docente_dict["ultima_fecha_acceso"], "%Y-%m-%d")
+        for llave in llaves_fecha:
+            if llave in docente_dict:
+                datetime.strptime(docente_dict[llave], "%Y-%m-%d")
 
     except ValueError:
-        flash("Error: El formato de fecha debe ser YYYY-MM-DD")
+        flash("Error: El formato de fecha debe ser YYYY-MM-DD", category="error")
         return redirect(url_for('admin_bg.conultar_docentes'))
 
     lista_docentes = DocenteDao.buscar_por_atributos(docente_dict)
