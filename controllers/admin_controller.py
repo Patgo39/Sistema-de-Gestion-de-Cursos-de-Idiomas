@@ -110,8 +110,8 @@ def consultar_docentes():
     llaves = [
         "id_usuario", "username", "nombre", "apellido_paterno", "apellido_materno",
         "email", "genero", "pais", "fecha_nacimiento_min", "fecha_nacimiento_max",
-        "ultima_fecha_acceso_min", "ultima_fecha_acceso_max"
-        "tiempo_experiencia", "especialidad"
+        "ultima_fecha_acceso_min", "ultima_fecha_acceso_max",
+        "tiempo_experiencia_min", "tiempo_experiencia_max" ,"especialidad"
     ]
 
     datos_entrada = request.get_json() if request.is_json else request.form

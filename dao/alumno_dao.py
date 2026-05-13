@@ -160,9 +160,11 @@ class AlumnoDao:
 
         campos_alumno = ['grado_actual']
 
+        campos_exactos_usuario = ['id_usuario', 'genero']
+
         campos_usuario = [
-            'id_usuario', 'username', 'nombre', 'apellido_paterno',
-            'apellido_materno', 'email', 'genero', 'pais'
+            'username', 'nombre', 'apellido_paterno',
+            'apellido_materno', 'email', 'pais'
         ]
 
         for clave, valor in filtros.items():
@@ -180,9 +182,12 @@ class AlumnoDao:
                 query = query.filter(Usuario.ultima_fecha_acceso <= valor)
 
             if clave in campos_alumno:
-                query = query.filter(getattr(Alumno, clave) == valor)
+                query = query.filter(getattr(Alumno, clave).ilike(f'%{valor}%'))
 
             elif clave in campos_usuario:
+                query = query.filter(getattr(Usuario, clave).ilike(f'%{valor}%'))
+
+            elif clave in campos_exactos_usuario:
                 query = query.filter(getattr(Usuario, clave) == valor)
 
         return query.all()

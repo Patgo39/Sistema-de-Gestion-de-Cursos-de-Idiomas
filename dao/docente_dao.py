@@ -158,14 +158,15 @@ class DocenteDao:
         fecha_nacimiento_max
         ultima_fecha_acceso_min
         ultima_fecha_acceso_max
-        tiempo_experiencia
+        tiempo_experiencia_min
+        tiempo_experiencia_max
         especialidad
         """
 
         query = Docente.query.join(Usuario, Docente.id_usuario == Usuario.id_usuario)
 
         campos_docente = ['especialidad']
-        campos_exactos = ['id_usuario', 'genero', 'tiempo_experiencia']
+        campos_exactos_usuario = ['id_usuario', 'genero']
         campos_usuario = [
             'username', 'nombre', 'apellido_paterno',
             'apellido_materno', 'email', 'pais'
@@ -185,14 +186,16 @@ class DocenteDao:
             if clave == 'ultima_fecha_acceso_max':
                 query = query.filter(Usuario.ultima_fecha_acceso <= valor)
 
+            if clave == 'tiempo_experiencia_min':
+                query = query.filter(Docente.tiempo_experiencia >= valor)
+            if clave == 'tiempo_experiencia_max':
+                query = query.filter(Docente.tiempo_experiencia <= valor)
+
             if clave in campos_docente:
                 query = query.filter(getattr(Docente, clave).ilike(f'%{valor}%'))
 
-            elif clave in campos_exactos:
-                if clave == 'id_usuario':
-                    query = query.filter(Usuario.id_usuario == valor)
-                else:
-                    query = query.filter(getattr(Docente, clave) == valor)
+            elif clave in campos_exactos_usuario:
+                query = query.filter(getattr(Usuario, clave) == valor)
 
             elif clave in campos_usuario:
                 query = query.filter(getattr(Usuario, clave).ilike(f'%{valor}%'))
