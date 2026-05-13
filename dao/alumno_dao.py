@@ -170,14 +170,14 @@ class AlumnoDao:
                 continue
 
             if clave == 'fecha_nacimiento_min':
-                query.filter(Usuario.fecha_nacimiento >= valor)
+                query = query.filter(Usuario.fecha_nacimiento >= valor)
             if clave == 'fecha_nacimiento_max':
-                query.filter(Usuario.fecha_nacimiento <= valor)
+                query = query.filter(Usuario.fecha_nacimiento <= valor)
 
             if clave == 'ultima_fecha_acceso_min':
-                query.filter(Usuario.ultima_fecha_acceso >= valor)
+                query = query.filter(Usuario.ultima_fecha_acceso >= valor)
             if clave == 'ultima_fecha_acceso_max':
-                query.filter(Usuario.ultima_fecha_acceso <= valor)
+                query = query.filter(Usuario.ultima_fecha_acceso <= valor)
 
             if clave in campos_alumno:
                 query = query.filter(getattr(Alumno, clave) == valor)

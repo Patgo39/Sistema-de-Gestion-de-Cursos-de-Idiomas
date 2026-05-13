@@ -164,11 +164,11 @@ class DocenteDao:
 
         query = Docente.query.join(Usuario, Docente.id_usuario == Usuario.id_usuario)
 
-        campos_docente = ['tiempo_experiencia', 'especialidad']
-
+        campos_docente = ['especialidad']
+        campos_exactos = ['id_usuario', 'genero', 'tiempo_experiencia']
         campos_usuario = [
-            'id_usuario', 'username', 'nombre', 'apellido_paterno',
-            'apellido_materno', 'email', 'genero', 'pais'
+            'username', 'nombre', 'apellido_paterno',
+            'apellido_materno', 'email', 'pais'
         ]
 
         for clave, valor in filtros.items():
@@ -176,19 +176,25 @@ class DocenteDao:
                 continue
 
             if clave == 'fecha_nacimiento_min':
-                query.filter(Usuario.fecha_nacimiento >= valor)
+                query = query.filter(Usuario.fecha_nacimiento >= valor)
             if clave == 'fecha_nacimiento_max':
-                query.filter(Usuario.fecha_nacimiento <= valor)
+                query = query.filter(Usuario.fecha_nacimiento <= valor)
 
             if clave == 'ultima_fecha_acceso_min':
-                query.filter(Usuario.ultima_fecha_acceso >= valor)
+                query = query.filter(Usuario.ultima_fecha_acceso >= valor)
             if clave == 'ultima_fecha_acceso_max':
-                query.filter(Usuario.ultima_fecha_acceso <= valor)
+                query = query.filter(Usuario.ultima_fecha_acceso <= valor)
 
             if clave in campos_docente:
-                query = query.filter(getattr(Docente, clave) == valor)
+                query = query.filter(getattr(Docente, clave).ilike(f'%{valor}%'))
+
+            elif clave in campos_exactos:
+                if clave == 'id_usuario':
+                    query = query.filter(Usuario.id_usuario == valor)
+                else:
+                    query = query.filter(getattr(Docente, clave) == valor)
 
             elif clave in campos_usuario:
-                query = query.filter(getattr(Usuario, clave) == valor)
+                query = query.filter(getattr(Usuario, clave).ilike(f'%{valor}%'))
 
         return query.all()

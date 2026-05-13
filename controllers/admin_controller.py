@@ -93,7 +93,7 @@ def gestionar_docentes(id_usuario):
                 datetime.strptime(docente_dict["fecha_nacimiento"], "%Y-%m-%d")
         except ValueError:
             flash("Error: El formato de fecha debe ser YYYY-MM-DD")
-            return redirect(url_for('admin.gestionar_docentes'))
+            return redirect(url_for('admin.gestionar_docentes', id_usuario=id_usuario))
 
         try:
             DocenteDao.actualizar_docente(id_usuario, docente_dict)
@@ -117,7 +117,7 @@ def consultar_docentes():
     datos_entrada = request.get_json() if request.is_json else request.form
     if not datos_entrada:
         flash("Error: Formato de datos incorrecto", category="error")
-        return redirect(url_for('admin.consultar_docentes'))
+        return redirect(url_for('admin.visualizar_docentes'))
 
     docente_dict = {
         k: datos_entrada.get(k)
@@ -137,30 +137,36 @@ def consultar_docentes():
 
     except ValueError:
         flash("Error: El formato de fecha debe ser YYYY-MM-DD", category="error")
-        return redirect(url_for('admin_bg.conultar_docentes'))
+        return redirect(url_for('admin.visualizar_docentes'))
 
-    lista_docentes = DocenteDao.buscar_por_atributos(docente_dict)
+    try:
 
-    docentes_json = [
-        {
-            "id_usuario": d.id_usuario,
-            "username": d.perfil_usuario.username,
-            "nombre": d.perfil_usuario.nombre,
-            "apellido_paterno": d.perfil_usuario.apellido_paterno,
-            "apellido_materno": d.perfil_usuario.apellido_materno,
-            "email": d.perfil_usuario.email,
-            "genero": d.perfil_usuario.genero,
-            "pais": d.perfil_usuario.pais,
-            "fecha_nacimiento": d.perfil_usuario.fecha_nacimiento.strftime(
-                "%Y-%m-%d") if d.perfil_usuario.fecha_nacimiento else None,
-            "ultima_fecha_acceso": d.perfil_usuario.ultima_fecha_acceso.strftime(
-                "%Y-%m-%d") if d.perfil_usuario.ultima_fecha_acceso else None,
-            "tiempo_experiencia": d.tiempo_experiencia,
-            "especialidad": d.especialidad
-        } for d in lista_docentes
-    ]
-    flash("Datos actualizados correctamente")
-    return jsonify(docentes_json)
+        lista_docentes = DocenteDao.buscar_por_atributos(docente_dict)
+
+        docentes_json = [
+            {
+                "id_usuario": d.id_usuario,
+                "username": d.perfil_usuario.username,
+                "nombre": d.perfil_usuario.nombre,
+                "apellido_paterno": d.perfil_usuario.apellido_paterno,
+                "apellido_materno": d.perfil_usuario.apellido_materno,
+                "email": d.perfil_usuario.email,
+                "genero": d.perfil_usuario.genero,
+                "pais": d.perfil_usuario.pais,
+                "fecha_nacimiento": d.perfil_usuario.fecha_nacimiento.strftime(
+                    "%Y-%m-%d") if d.perfil_usuario.fecha_nacimiento else None,
+                "ultima_fecha_acceso": d.perfil_usuario.ultima_fecha_acceso.strftime(
+                    "%Y-%m-%d") if d.perfil_usuario.ultima_fecha_acceso else None,
+                "tiempo_experiencia": d.tiempo_experiencia,
+                "especialidad": d.especialidad
+            } for d in lista_docentes
+        ]
+        flash("Datos actualizados correctamente")
+        return jsonify(docentes_json)
+    except Exception as e:
+        msg = str(e)
+        flash(f"Error: {msg}")
+        return redirect(url_for('admin.visualizar_docentes'))
 
 @admin_bp.route('/gestionar_alumnos', methods=['GET'])
 def visualizar_alumnos():
@@ -249,13 +255,15 @@ def gestionar_alumnos(id_usuario):
 def consultar_alumnos():
     llaves = [
         "id_usuario", "username", "nombre", "apellido_paterno", "apellido_materno",
-        "email", "genero", "pais", "fecha_nacimiento", "ultima_fecha_acceso",
+        "email", "genero", "pais", "fecha_nacimiento_min", "fecha_nacimiento_max",
+        "ultima_fecha_acceso_min", "ultima_fecha_acceso_max",
         "grado_actual"
     ]
 
     datos_entrada = request.get_json() if request.is_json else request.form
     if not datos_entrada:
-        return redirect(url_for('admin.consultar_alumnos'))
+        flash("Error: Formato de datos incorrecto", category="error")
+        return redirect(url_for('admin.visualizar_alumnos'))
 
     alumno_dict = {
         k: datos_entrada.get(k)
@@ -263,16 +271,19 @@ def consultar_alumnos():
         if datos_entrada.get(k)
     }
 
+    llaves_fecha = [
+        "fecha_nacimiento_min", "fecha_nacimiento_max",
+        "ultima_fecha_acceso_min", "ultima_fecha_acceso_max"
+    ]
 
     try:
-        if "fecha_nacimiento" in alumno_dict:
-            datetime.strptime(alumno_dict["fecha_nacimiento"], "%Y-%m-%d")
-        if "ultima_fecha_acceso" in alumno_dict:
-            datetime.strptime(alumno_dict["ultima_fecha_acceso"], "%Y-%m-%d")
+        for llave in llaves_fecha:
+            if llave in alumno_dict:
+                datetime.strptime(alumno_dict[llave], "%Y-%m-%d")
 
     except ValueError:
         flash("Error: El formato de fecha debe ser YYYY-MM-DD")
-        return redirect(url_for('admin.conultar_alumnos'))
+        return redirect(url_for('admin.visualizar_alumnos'))
 
     try:
         lista_alumnos = AlumnoDao.buscar_por_atributos(alumno_dict)
@@ -300,4 +311,4 @@ def consultar_alumnos():
     except Exception as e:
         msg = str(e)
         flash(f"Error: {msg}")
-        return redirect(url_for('admin.conultar_alumnos'))
+        return redirect(url_for('admin.visualizar_alumnos'))
