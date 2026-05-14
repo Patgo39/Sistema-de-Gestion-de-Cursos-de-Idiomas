@@ -16,7 +16,7 @@ def tablero_administrador():
     if not nombre:
         flash("Por favor, inicia sesión primero")
         return redirect(url_for('auth.iniciar_sesion'))
-    return f"Bienvenido {nombre}"
+    return render_template('admin/tablero_admin.html')
 
 @admin_bp.route('/gestionar_docentes', methods=['GET'])
 def visualizar_docentes():
