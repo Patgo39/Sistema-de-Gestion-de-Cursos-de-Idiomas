@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ curso.nombre_curso }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/docente/curso_informacion.css') }}">
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar"></div>
+        <div class="main">
+            <div class="card-header">
+                <h2>{{ curso.nombre_curso }} — Curso #{{ curso.id_curso }}</h2>
+            </div>
+            <ol class="alumno-lista">
+                {% for alumno in lista_inscripcion %}
+                    <li>
+                        <a href="{{ url_for('docente.datos_alumno', id_curso=curso.id_curso, id_usuario=alumno.id_usuario) }}">
+                            {{ alumno.nombre_completo }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
