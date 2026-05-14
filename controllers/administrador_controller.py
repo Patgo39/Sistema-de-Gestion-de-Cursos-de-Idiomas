@@ -5,6 +5,10 @@ admin_bp = Blueprint('administrador', __name__)
 
 @admin_bp.route('/tablero_administrador', methods=['GET'])
 def tablero_admin():
+    '''
+    Muestra el tablero de administradoe con base en su username
+    :return: redirect del tablero de administrador con base de su username
+    '''
     if 'username' not in session or session.get('rol').lower() not in ['admin', 'administrador']:
         flash("Acceso denegado. No tienes permisos de administrador.")
         return redirect(url_for('auth.iniciar_sesion'))

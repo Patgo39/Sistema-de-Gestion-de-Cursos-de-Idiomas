@@ -6,7 +6,10 @@ alumno_bp = Blueprint('alumno', __name__)
 
 @alumno_bp.route('/tablero_alumno', methods=['GET'])
 def tablero_alumno():
-
+    '''
+    Muestra el tablero de alumno con base en su username y id de usuario
+    :return: redirect del tablero de alumno con base de su username y id de usuario
+    '''
     if 'username' not in session or session.get('rol').lower() != 'alumno':
         flash("Acceso denegado. Debes iniciar sesión como alumno.")
         return redirect(url_for('auth.iniciar_sesion'))

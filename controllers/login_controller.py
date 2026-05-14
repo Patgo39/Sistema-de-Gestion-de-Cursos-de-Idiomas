@@ -4,6 +4,12 @@ login_bp = Blueprint('auth', __name__)
 
 @login_bp.route('/login', methods=['GET', 'POST'])
 def iniciar_sesion():
+    '''
+    Metodo para inicar sesion de usuario (controlador)
+    Si es POST  pide los datos para iniciar sesion de usuario
+    Si es GET muestra la pagina de iniciar sesion
+    :return:
+    '''
     if request.method == 'GET':
         return render_template('auth/LoginIH.html')
 
@@ -34,8 +40,12 @@ def iniciar_sesion():
             return redirect(url_for('auth.iniciar_sesion'))
 @login_bp.route('/logout')
 def cerrar_sesion():
+    '''
+    Metodo para cerrar sesion de usuario (controlador)
+    :return: redirect para cerrar sesion de usuario (controlador)
+    '''
     session.clear()
-    flash("Has cerrado sesión exitosamente.")
+    flash("Has cerrado sesión exitosamente.", 'success')
     return redirect(url_for('auth.iniciar_sesion'))
 
 

@@ -1,12 +1,70 @@
-<div class="dashboard-container">
-    <h1>Panel del Docente: {{ nombre }}</h1>
-    <nav>
-        <a href="#">Crear Nuevo Curso</a> |
-        <a href="{{ url_for('auth.cerrar_sesion') }}">Cerrar Sesión</a>
-    </nav>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Docente</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}" />
+  <style>
 
-    <section>
-        <h2>Cursos que impartes</h2>
+      .sidebar { padding: 20px; color: white; display: flex; flex-direction: column; gap: 20px; }
+      .sidebar a { color: white; text-decoration: none; font-weight: bold; padding: 10px; border-radius: 5px; }
+      .sidebar a:hover { background: rgba(255,255,255,0.2); }
+
+
+      .welcome-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+
+
+      table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+      th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eaeaea; }
+      th { background-color: #f8f9fa; color: #333; font-weight: bold; }
+      tr:hover { background-color: #f1f1f1; }
+      .btn-action { color: #007bff; text-decoration: none; font-weight: bold; margin-right: 15px; }
+      .btn-action:hover { text-decoration: underline; color: #0056b3; }
+      .btn-primary { background: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; }
+      .btn-primary:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+
+    <aside class="sidebar">
+        <h2></h2>
+        <hr>
+        <a href="#">Mis Cursos</a>
+        <a href="#">Crear Nuevo Curso</a>
+        <a href="#">Mis Alumnos</a>
+        <a href="#">Mi Perfil</a>
+        <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main" style="padding: 40px; align-items: flex-start; justify-content: flex-start; width: 100%;">
+
+      <div class="welcome-card" style="width: 100%;">
+        <h1>¡Bienvenido, {{ nombre }}!</h1>
+        <p>Has iniciado sesión como <strong>Docente</strong>. Aquí podrás gestionar tus clases y alumnos.</p>
+
+        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3>{{ cursos|length }}</h3> <p>Cursos Creados</p>
+            </div>
+            <div style="background: #f1f8e9; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3>0</h3>
+                <p>Alumnos Inscritos</p>
+            </div>
+            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3>0</h3>
+                <p>Tareas por Revisar</p>
+            </div>
+        </div>
+      </div>
+
+      <div class="welcome-card" style="width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0;">Cursos que impartes</h2>
+            <a href="#" class="btn-primary">+ Nuevo Curso</a>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -18,12 +76,25 @@
             <tbody>
                 {% for curso in cursos %}
                 <tr>
-                    <td>{{ curso.nombre_curso }}</td>
+                    <td><strong>{{ curso.nombre_curso }}</strong></td>
                     <td>{{ curso.nivel }}</td>
-                    <td><a href="#">Gestionar</a> | <a href="#">Ver Alumnos</a></td>
+                    <td>
+                        <a href="#" class="btn-action">Gestionar</a>
+                        <a href="#" class="btn-action">Ver Alumnos</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #777; padding: 30px;">
+                        Aún no tienes cursos creados. Haz clic en "+ Nuevo Curso" para empezar.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </section>
-</div>
+      </div>
+
+    </main>
+  </div>
+</body>
+</html>

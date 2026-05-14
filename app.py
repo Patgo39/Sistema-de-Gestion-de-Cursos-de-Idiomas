@@ -14,7 +14,6 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
-
 app.config['UPLOAD_FOLDER'] = 'static/uploads/recursos'
 user = os.getenv('DB_USER')
 password = os.getenv('DB_PASS')
@@ -26,7 +25,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 db.init_app(app)
-
 app.register_blueprint(login_bp, url_prefix='/auth')
 app.register_blueprint(registro_bp, url_prefix='/sign_up')
 app.register_blueprint(alumno_bp, url_prefix='/alumno')

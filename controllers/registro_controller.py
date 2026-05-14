@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, flash, url_for
 from dao.usuario_dao import UsuarioDao
@@ -7,6 +8,13 @@ registro_bp = Blueprint('sign_up', __name__)
 
 @registro_bp.route('/registro', methods=['GET', 'POST'])
 def registrar_usuario():
+    '''
+    Metodo para registrar usuario (controlador)
+    Registrar Usuario identificando si es POST pide el registro de nuevo usuario y manda a llamar
+    a UsuarioDao para guardarlo en la base de datos identificanod si es alumno o docente
+    Si es Get redirige a la pagina de Registrar Usuario
+    :return:
+    '''
     if request.method == 'GET':
         return render_template('auth/RegistroUsuarioIH.html')
 
@@ -22,6 +30,17 @@ def registrar_usuario():
         genero = request.form.get('genero')
         pais = request.form.get('pais')
         rol = request.form.get('rol')
+
+        patron_correo = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(patron_correo, email):
+            flash('Por favor, ingresa un correo electrónico válido.', 'error')
+            return redirect(url_for('sign_up.registrar_usuario'))
+
+
+        if len(password) < 8 or not re.search(r'[A-Z]', password) or not re.search(r'[a-z]', password) or not re.search(
+                r'\d', password):
+            flash('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.', 'error')
+            return redirect(url_for('sign_up.registrar_usuario'))
 
         if rol == 'docente':
             tiempo_experiencia = int(request.form.get('tiempo_experiencia'))
@@ -41,10 +60,10 @@ def registrar_usuario():
             )
 
             if exito:
-                flash('Usuario registrado exitosamente')
+                flash('Docente registrado exitosamente', 'success')
                 return redirect(url_for('auth.iniciar_sesion'))
             else:
-                flash("Error al registrar docente")
+                flash("Error al registrar docente", "error")
                 return redirect(url_for('sign_up.registrar_usuario'))
 
         elif rol == 'alumno':
@@ -63,9 +82,9 @@ def registrar_usuario():
             )
 
             if exito:
-                flash('Usuario registrado exitosamente')
+                flash('Alumno registrado exitosamente', 'success')
                 return redirect(url_for('auth.iniciar_sesion'))
             else:
-                flash("Error al registrar alumno")
+                flash("Error al registrar alumno", "error")
                 return redirect(url_for('sign_up.registrar_usuario'))
 
