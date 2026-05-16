@@ -38,6 +38,20 @@
         <div class="field"><label>Usuario</label><input type="text" name="username" placeholder="Tu usuario" required /></div>
         <div class="field"><label>Contraseña</label><input type="password" name="password" placeholder="••••••••" required /></div>
         <div class="field"><label>Nombre(s)</label><input type="text" name="nombre" required /></div>
+        <div class="field">
+            <label>Género</label>
+            <select name="genero" required>
+                <option value="" disabled selected>Selecciona tu género</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+                <option value="O">Otro/Prefiero no decirlo</option>
+            </select>
+        </div>
+
+          <div class="field">
+            <label>País</label>
+            <input type="text" name="pais" placeholder="Ej. México, Colombia, España" required />
+          </div>
 
         <div style="display: flex; gap: 10px;">
             <div class="field" style="flex: 1;"><label>Apellido Paterno</label><input type="text" name="apellido_paterno" required /></div>
