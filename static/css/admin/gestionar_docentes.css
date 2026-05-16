@@ -20,6 +20,46 @@
   border-radius: 10px;
 }
 
+/* --- Contenedor de Alertas Integradas --- */
+#alertContainer {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.custom-alert {
+  background-color: #fef2f2;
+  border-left: 4px solid #ef4444;
+  color: #991b1b;
+  padding: 14px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.05);
+  animation: fadeInAlert 0.3s ease-out;
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+.close-alert {
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #f87171;
+  transition: color 0.2s;
+}
+
+.close-alert:hover {
+  color: #991b1b;
+}
+
+@keyframes fadeInAlert {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* --- Panel de Filtros --- */
 .filter-section {
   background: #ffffff;

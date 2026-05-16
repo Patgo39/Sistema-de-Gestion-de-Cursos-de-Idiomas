@@ -168,6 +168,15 @@ def consultar_docentes():
         flash(f"Error: {msg}")
         return redirect(url_for('admin.visualizar_docentes'))
 
+@admin_bp.route('/eliminar_docente/<id_usuario>', methods=['GET'])
+def eliminar_docente(id_usuario):
+
+    try:
+        DocenteDao.eliminar_docente(id_usuario)
+    except Exception as e:
+        flash(f"Error: {e}", category="error")
+        return redirect(url_for('admin.visualizar_docentes'))
+
 @admin_bp.route('/gestionar_alumnos', methods=['GET'])
 def visualizar_alumnos():
     lista_alumnos = AlumnoDao.buscar_alumnos()
@@ -249,6 +258,7 @@ def gestionar_alumnos(id_usuario):
             msg = str(e)
             flash(f"Error: {msg}")
             return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
+
 
 
 @admin_bp.route('/consultar_alumnos', methods=['POST'])

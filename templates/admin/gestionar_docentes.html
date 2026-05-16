@@ -25,6 +25,8 @@
         <p>Utiliza los filtros de búsqueda o selecciona un docente de la lista para editarlo.</p>
       </section>
 
+      <div id="alertContainer"></div>
+
       <fieldset class="filter-section">
         <legend>Filtros de Búsqueda Avanzada</legend>
         <form id="filterForm">
@@ -54,12 +56,13 @@
                   <input type="email" name="email" placeholder="correo@ejemplo.com">
               </div>
               <div class="f-field">
-                  <label>Género</label>
-                  <select name="genero">
-                      <option value="">Todos</option>
-                      <option value="M">Masculino (M)</option>
-                      <option value="F">Femenino (F)</option>
-                  </select>
+                <label>Género</label>
+                <select name="genero" id="filter-genero">
+                    <option value="" selected>Todos / Sin especificar</option>
+                    <option value="M">Masculino (M)</option>
+                    <option value="F">Femenino (F)</option>
+                    <option value="O">Otro (O)</option>
+                </select>
               </div>
               <div class="f-field">
                   <label>País</label>
@@ -198,6 +201,40 @@
         }
       });
 
+      // Validar si el formulario está totalmente vacío
+      if (Object.keys(searchParams).length === 0) {
+        showAlert("Debe llenar al menos 1 campo para realizar una búsqueda.");
+        return;
+      }
+
+      // Validar Rangos de Fechas
+      const dateRanges = [
+        { min: 'fecha_nacimiento_min', max: 'fecha_nacimiento_max', label: 'Nacimiento' },
+        { min: 'ultima_fecha_acceso_min', max: 'ultima_fecha_acceso_max', label: 'Último Acceso' }
+      ];
+
+      for (const range of dateRanges) {
+        const valMin = searchParams[range.min];
+        const valMax = searchParams[range.max];
+
+        // Regla 1: Co-dependencia de fechas
+        if ((valMin && !valMax) || (!valMin && valMax)) {
+            showAlert(`Para el rango de ${range.label}, debes llenar tanto la fecha 'Desde' como 'Hasta'.`);
+            return;
+        }
+
+        // Regla 2: Orden cronológico estricto
+        if (valMin && valMax) {
+            const dateMin = new Date(valMin);
+            const dateMax = new Date(valMax);
+
+            if (dateMin > dateMax) {
+                showAlert(`En el rango de ${range.label}, la fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.`);
+                return;
+            }
+        }
+      }
+
       try {
         const response = await fetch("{{ url_for('admin.consultar_docentes') }}", {
           method: "POST",
@@ -205,16 +242,42 @@
           body: JSON.stringify(searchParams)
         });
 
-        if (!response.ok) throw new Error("Error en la respuesta del servidor");
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || "Error en la respuesta del servidor");
+        }
 
         const docentes = await response.json();
         renderDocentes(docentes);
 
       } catch (error) {
         console.error("Error al filtrar:", error);
-        alert("Hubo un error al procesar la búsqueda.");
+        showAlert(error.message || "Hubo un error al procesar la búsqueda.");
       }
     });
+
+    // --- Muestra alertas personalizadas integradas en pantalla ---
+    function showAlert(message) {
+      const alertContainer = document.getElementById("alertContainer");
+      alertContainer.innerHTML = ""; // Limpiar alertas anteriores
+
+      const alertBox = document.createElement("div");
+      alertBox.className = "custom-alert";
+      alertBox.innerHTML = `
+        <span>${message}</span>
+        <span class="close-alert" onclick="this.parentElement.remove()">&times;</span>
+      `;
+
+      alertContainer.appendChild(alertBox);
+
+      // Desvanecimiento automático a los 5 segundos
+      setTimeout(() => {
+        if (alertBox.parentElement) {
+          alertBox.style.opacity = "0";
+          setTimeout(() => alertBox.remove(), 300);
+        }
+      }, 5000);
+    }
 
     // --- Renderizado Dinámico de las Tarjetas ---
     function renderDocentes(lista) {
@@ -254,7 +317,6 @@
       filterForm.reset();
     }
 
-    // Fuerza la recarga redirigiendo al endpoint inicial GET
     function reloadAllDocentes() {
       window.location.href = "{{ url_for('admin.visualizar_docentes') }}";
     }
