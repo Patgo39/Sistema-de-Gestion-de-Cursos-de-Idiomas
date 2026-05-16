@@ -41,7 +41,7 @@ def visualizar_docentes():
         } for d in lista_docentes
     ]
 
-    return jsonify(docentes_json)
+    return render_template('admin/gestionar_docentes.html', docentes=docentes_json)
 
     return lista_docentes
 @admin_bp.route('/gestionar_docentes/<id_usuario>', methods=['GET', 'POST'])
