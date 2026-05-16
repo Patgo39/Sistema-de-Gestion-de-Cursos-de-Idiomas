@@ -67,7 +67,7 @@ def gestionar_docentes(id_usuario):
                 "especialidad": d.especialidad
             }
         ]
-        return jsonify(docente)
+        return render_template('admin/editar_docente.html', docente=docente)
 
     elif request.method == 'POST':
         llaves = [

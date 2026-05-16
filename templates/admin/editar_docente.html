@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Docente - Linguamail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/tablero_admin.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/editar_docente.css') }}" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2>Linguamail</h2>
+        <hr>
+        <a href="{{ url_for('admin.tablero_administrador') }}">Inicio</a>
+        <a href="{{ url_for('admin.visualizar_docentes') }}" class="active">Gestionar Docentes</a>
+        <a href="{{ url_for('admin.visualizar_alumnos') }}">Gestionar Alumnos</a>
+        <a href="#">Configuración</a>
+        <a href="#!" class="btn-logout">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main">
+      <section class="welcome-header">
+        <h1>Perfil del Docente: {{ docente.username }}</h1>
+        <p>Modifica los campos necesarios haciendo clic sobre ellos. Los cambios se habilitarán automáticamente.</p>
+      </section>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div id="alertContainer">
+            {% for message in messages %}
+              <div class="custom-alert {% if 'Error' in message %}alert-danger{% else %}alert-success{% endif %}">
+                <span>{{ message }}</span>
+                <span class="close-alert" onclick="this.parentElement.remove()">&times;</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="form-container">
+        <form id="editDocenteForm" method="POST" action="{{ url_for('admin.gestionar_docentes', id_usuario=docente.id_usuario) }}">
+
+          <div class="edit-grid">
+
+            <div class="edit-field-group">
+              <label for="username">Username</label>
+              <div class="input-wrapper">
+                <input type="text" id="username" name="username" value="{{ docente.username }}" required />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="email">Correo Electrónico</label>
+              <div class="input-wrapper">
+                <input type="email" id="email" name="email" value="{{ docente.email }}" required />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="nombre">Nombre(s)</label>
+              <div class="input-wrapper">
+                <input type="text" id="nombre" name="nombre" value="{{ docente.nombre }}" required />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="apellido_paterno">Apellido Paterno</label>
+              <div class="input-wrapper">
+                <input type="text" id="apellido_paterno" name="apellido_paterno" value="{{ docente.apellido_paterno }}" required />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="apellido_materno">Apellido Materno</label>
+              <div class="input-wrapper">
+                <input type="text" id="apellido_materno" name="apellido_materno" value="{{ docente.apellido_materno or '' }}" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="genero">Género</label>
+              <div class="input-wrapper">
+                <select id="genero" name="genero">
+                  <option value="M" {% if docente.genero == 'M' %}selected{% endif %}>Masculino (M)</option>
+                  <option value="F" {% if docente.genero == 'F' %}selected{% endif %}>Femenino (F)</option>
+                  <option value="O" {% if docente.genero == 'O' %}selected{% endif %}>Otro (O)</option>
+                </select>
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="pais">País</label>
+              <div class="input-wrapper">
+                <input type="text" id="pais" name="pais" value="{{ docente.pais or '' }}" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+              <div class="input-wrapper">
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ docente.fecha_nacimiento or '' }}" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="especialidad">Especialidad</label>
+              <div class="input-wrapper">
+                <input type="text" id="especialidad" name="especialidad" value="{{ docente.especialidad or '' }}" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="tiempo_experiencia">Años de Experiencia</label>
+              <div class="input-wrapper">
+                <input type="number" id="tiempo_experiencia" name="tiempo_experiencia" value="{{ docente.tiempo_experiencia or 0 }}" min="0" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="password">Nueva Contraseña (Opcional)</label>
+              <div class="input-wrapper">
+                <input type="password" id="password" name="password" placeholder="Dejar en blanco para conservar actual" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="form-actions-footer">
+            <a href="{{ url_for('admin.visualizar_docentes') }}" class="btn-action btn-back">Volver</a>
+            <button type="submit" id="btnSubmit" class="btn-action btn-update" disabled>Actualizar Docente</button>
+            <button type="button" class="btn-action btn-delete" disabled title="Función deshabilitada temporalmente">Eliminar Docente</button>
+          </div>
+
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const form = document.getElementById('editDocenteForm');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    // Almacenamos el estado inicial de todos los elementos del formulario
+    const initialState = {};
+
+    // Guardar valores iniciales al cargar la página
+    Array.from(form.elements).forEach(element => {
+      if (element.name) {
+        initialState[element.name] = element.value;
+      }
+    });
+
+    // Escuchar cambios concurrentes en el formulario
+    form.addEventListener('input', () => {
+      let hasChanges = false;
+
+      Array.from(form.elements).forEach(element => {
+        if (element.name) {
+          // Si es la contraseña, se activa solo si escribieron algo
+          if (element.name === 'password') {
+            if (element.value.trim() !== "") hasChanges = true;
+          }
+          // Para cualquier otro campo, comparamos si cambió de su valor original
+          else if (element.value !== initialState[element.name]) {
+            hasChanges = true;
+          }
+        }
+      });
+
+      // Habilitar o deshabilitar botón según corresponda
+      btnSubmit.disabled = !hasChanges;
+    });
+  </script>
+</body>
+</html>

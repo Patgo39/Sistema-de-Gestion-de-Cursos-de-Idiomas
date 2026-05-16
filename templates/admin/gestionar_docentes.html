@@ -108,7 +108,7 @@
 
       <div class="docentes-list" id="docentesContainer">
         {% for d in docentes %}
-        <div class="docente-card" onclick="openModal({{ d | tojson }})">
+        <div class="docente-card" onclick="redirigirAEditar({{ d.id_usuario }})">
             <div class="card-header">
                 <span class="user-id">ID: #{{ d.id_usuario }}</span>
                 <h3>{{ d.username }}</h3>
@@ -127,66 +127,14 @@
     </main>
   </div>
 
-  <div id="editModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2>Editar Información</h2>
-      <hr>
-      <form id="editForm" action="/admin/actualizar_docente" method="POST">
-        <input type="hidden" name="id_usuario" id="form-id">
-
-        <div class="form-grid">
-            <div class="field">
-                <label>Nombre(s)</label>
-                <input type="text" name="nombre" id="form-nombre">
-            </div>
-            <div class="field">
-                <label>Apellido Paterno</label>
-                <input type="text" name="apellido_paterno" id="form-paterno">
-            </div>
-            <div class="field">
-                <label>Apellido Materno</label>
-                <input type="text" name="apellido_materno" id="form-materno">
-            </div>
-            <div class="field">
-                <label>Especialidad</label>
-                <input type="text" name="especialidad" id="form-especialidad">
-            </div>
-            <div class="field">
-                <label>País</label>
-                <input type="text" name="pais" id="form-pais">
-            </div>
-            <div class="field">
-                <label>Años de Experiencia</label>
-                <input type="number" name="tiempo_experiencia" id="form-exp">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn-save">Actualizar Datos</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <script>
-    const modal = document.getElementById("editModal");
     const filterForm = document.getElementById("filterForm");
     const container = document.getElementById("docentesContainer");
 
-    // --- Manejo del Modal de Edición ---
-    function openModal(docente) {
-      document.getElementById("form-id").value = docente.id_usuario;
-      document.getElementById("form-nombre").value = docente.nombre;
-      document.getElementById("form-paterno").value = docente.apellido_paterno;
-      document.getElementById("form-materno").value = docente.apellido_materno;
-      document.getElementById("form-especialidad").value = docente.especialidad;
-      document.getElementById("form-pais").value = docente.pais;
-      document.getElementById("form-exp").value = docente.tiempo_experiencia;
-      modal.style.display = "flex";
+    // --- Función de Redirección ---
+    function redirigirAEditar(idUsuario) {
+      window.location.href = `/admin/gestionar_docentes/${idUsuario}`;
     }
-
-    function closeModal() { modal.style.display = "none"; }
-    window.onclick = function(event) { if (event.target == modal) closeModal(); }
 
     // --- Petición Asíncrona (AJAX / Fetch) para Filtros ---
     filterForm.addEventListener("submit", async (e) => {
@@ -201,7 +149,6 @@
         }
       });
 
-      // Validar si el formulario está totalmente vacío
       if (Object.keys(searchParams).length === 0) {
         showAlert("Debe llenar al menos 1 campo para realizar una búsqueda.");
         return;
@@ -217,13 +164,11 @@
         const valMin = searchParams[range.min];
         const valMax = searchParams[range.max];
 
-        // Regla 1: Co-dependencia de fechas
         if ((valMin && !valMax) || (!valMin && valMax)) {
             showAlert(`Para el rango de ${range.label}, debes llenar tanto la fecha 'Desde' como 'Hasta'.`);
             return;
         }
 
-        // Regla 2: Orden cronológico estricto
         if (valMin && valMax) {
             const dateMin = new Date(valMin);
             const dateMax = new Date(valMax);
@@ -256,10 +201,10 @@
       }
     });
 
-    // --- Muestra alertas personalizadas integradas en pantalla ---
+    // --- Alertas integradas ---
     function showAlert(message) {
       const alertContainer = document.getElementById("alertContainer");
-      alertContainer.innerHTML = ""; // Limpiar alertas anteriores
+      alertContainer.innerHTML = "";
 
       const alertBox = document.createElement("div");
       alertBox.className = "custom-alert";
@@ -270,7 +215,6 @@
 
       alertContainer.appendChild(alertBox);
 
-      // Desvanecimiento automático a los 5 segundos
       setTimeout(() => {
         if (alertBox.parentElement) {
           alertBox.style.opacity = "0";
@@ -279,7 +223,7 @@
       }, 5000);
     }
 
-    // --- Renderizado Dinámico de las Tarjetas ---
+    // --- Renderizado Dinámico de las Tarjetas (Mantiene el redireccionamiento tras buscar) ---
     function renderDocentes(lista) {
       container.innerHTML = "";
 
@@ -292,8 +236,8 @@
         const card = document.createElement("div");
         card.className = "docente-card";
 
-        const dJson = JSON.stringify(d).replace(/"/g, '&quot;');
-        card.setAttribute("onclick", `openModal(${dJson})`);
+        // Al hacer click sobre los nuevos resultados filtrados asíncronamente, también redirige
+        card.setAttribute("onclick", `redirigirAEditar(${d.id_usuario})`);
 
         card.innerHTML = `
             <div class="card-header">
