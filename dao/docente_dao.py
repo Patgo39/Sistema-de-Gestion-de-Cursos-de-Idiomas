@@ -56,8 +56,34 @@ class DocenteDao:
         """
         docente = DocenteDao.buscar_por_id(id_docente)
 
+
         if not docente:
             raise Exception(f"No se encontró el docente con id : {id_docente}")
+
+        if 'username' in datos and datos['username']:
+
+            if datos['username'] is None or not str(datos['username']).strip():
+                raise Exception("El username no puede ser vacio.")
+
+            nuevo_username = datos['username']
+            usuario_existente = Usuario.query.filter(
+                Usuario.username == nuevo_username,
+                Usuario.id_usuario != docente.id_usuario
+            ).first()
+
+            if usuario_existente:
+                raise Exception(f"El nombre de usuario '{nuevo_username}' ya está en uso por otra cuenta.")
+
+        if 'email' in datos and datos['email']:
+            if datos['email'] is not None and str(datos['email']).strip():
+                nuevo_email = datos['email']
+                usuario_email_existente = Usuario.query.filter(
+                    Usuario.email == nuevo_email,
+                    Usuario.id_usuario != docente.id_usuario
+                ).first()
+
+                if usuario_email_existente:
+                    raise Exception(f"El email {nuevo_email} ya esta en uso por otra cuenta.")
 
         try:
             if 'tiempo_experiencia' in datos:

@@ -127,20 +127,12 @@
               </div>
             </div>
 
-            <div class="edit-field-group">
-              <label for="password">Nueva Contraseña (Opcional)</label>
-              <div class="input-wrapper">
-                <input type="password" id="password" name="password" placeholder="Dejar en blanco para conservar actual" />
-                <span class="edit-icon">&#9998;</span>
-              </div>
-            </div>
-
           </div>
 
           <div class="form-actions-footer">
             <a href="{{ url_for('admin.visualizar_docentes') }}" class="btn-action btn-back">Volver</a>
             <button type="submit" id="btnSubmit" class="btn-action btn-update" disabled>Actualizar Docente</button>
-            <button type="button" class="btn-action btn-delete" disabled title="Función deshabilitada temporalmente">Eliminar Docente</button>
+            <button type="button" class="btn-action btn-delete" onclick="confirmarEliminacion({{ docente.id_usuario }}, '{{ docente.username }}')">Eliminar Docente</button>
           </div>
 
         </form>
@@ -152,36 +144,39 @@
     const form = document.getElementById('editDocenteForm');
     const btnSubmit = document.getElementById('btnSubmit');
 
-    // Almacenamos el estado inicial de todos los elementos del formulario
     const initialState = {};
 
-    // Guardar valores iniciales al cargar la página
+    // Guardar valores iniciales
     Array.from(form.elements).forEach(element => {
       if (element.name) {
         initialState[element.name] = element.value;
       }
     });
 
-    // Escuchar cambios concurrentes en el formulario
+    // Validar si algún campo ha cambiado
     form.addEventListener('input', () => {
       let hasChanges = false;
 
       Array.from(form.elements).forEach(element => {
         if (element.name) {
-          // Si es la contraseña, se activa solo si escribieron algo
-          if (element.name === 'password') {
-            if (element.value.trim() !== "") hasChanges = true;
-          }
-          // Para cualquier otro campo, comparamos si cambió de su valor original
-          else if (element.value !== initialState[element.name]) {
+          if (element.value !== initialState[element.name]) {
             hasChanges = true;
           }
         }
       });
 
-      // Habilitar o deshabilitar botón según corresponda
       btnSubmit.disabled = !hasChanges;
     });
+
+    // Función para manejar la eliminación con advertencia previa
+    function confirmarEliminacion(idUsuario, username) {
+      const mensaje = `¿Estás completamente seguro de que deseas eliminar al docente "${username}"?\n\nEsta acción es permanente y borrará todo su historial del sistema.`;
+
+      if (confirm(mensaje)) {
+        // Redirige al endpoint GET que procesa la eliminación en cascada o lógica
+        window.location.href = `/admin/eliminar_docente/${idUsuario}`;
+      }
+    }
   </script>
 </body>
 </html>

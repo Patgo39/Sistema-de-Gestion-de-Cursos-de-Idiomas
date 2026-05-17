@@ -150,7 +150,7 @@
       });
 
       if (Object.keys(searchParams).length === 0) {
-        showAlert("Debe llenar al menos 1 campo para realizar una búsqueda.");
+        showAlert("Debe llenar al menos 1 campo para realizar una búsqueda.", "error");
         return;
       }
 
@@ -165,7 +165,7 @@
         const valMax = searchParams[range.max];
 
         if ((valMin && !valMax) || (!valMin && valMax)) {
-            showAlert(`Para el rango de ${range.label}, debes llenar tanto la fecha 'Desde' como 'Hasta'.`);
+            showAlert(`Para el rango de ${range.label}, debes llenar tanto la fecha 'Desde' como 'Hasta'.`, "error");
             return;
         }
 
@@ -174,7 +174,7 @@
             const dateMax = new Date(valMax);
 
             if (dateMin > dateMax) {
-                showAlert(`En el rango de ${range.label}, la fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.`);
+                showAlert(`En el rango de ${range.label}, la fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.`, "error");
                 return;
             }
         }
@@ -197,17 +197,21 @@
 
       } catch (error) {
         console.error("Error al filtrar:", error);
-        showAlert(error.message || "Hubo un error al procesar la búsqueda.");
+        showAlert(error.message || "Hubo un error al procesar la búsqueda.", "error");
       }
     });
 
-    // --- Alertas integradas ---
-    function showAlert(message) {
+    // --- Alertas integradas (Soporta dinámicamente clases de éxito y error) ---
+    function showAlert(message, type = "error") {
       const alertContainer = document.getElementById("alertContainer");
       alertContainer.innerHTML = "";
 
       const alertBox = document.createElement("div");
-      alertBox.className = "custom-alert";
+
+      // Asignar clase correspondiente según la categoría recibida para que CSS aplique colores
+      const alertClass = type === "success" ? "alert-success" : "alert-danger";
+      alertBox.className = `custom-alert ${alertClass}`;
+
       alertBox.innerHTML = `
         <span>${message}</span>
         <span class="close-alert" onclick="this.parentElement.remove()">&times;</span>
@@ -223,7 +227,7 @@
       }, 5000);
     }
 
-    // --- Renderizado Dinámico de las Tarjetas (Mantiene el redireccionamiento tras buscar) ---
+    // --- Renderizado Dinámico de las Tarjetas ---
     function renderDocentes(lista) {
       container.innerHTML = "";
 
@@ -235,8 +239,6 @@
       lista.forEach(d => {
         const card = document.createElement("div");
         card.className = "docente-card";
-
-        // Al hacer click sobre los nuevos resultados filtrados asíncronamente, también redirige
         card.setAttribute("onclick", `redirigirAEditar(${d.id_usuario})`);
 
         card.innerHTML = `
@@ -256,6 +258,21 @@
         container.appendChild(card);
       });
     }
+
+    // --- Lector de mensajes Flash acoplado a categorías de Flask ---
+    window.addEventListener('DOMContentLoaded', () => {
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            {% if 'success' in category or 'message' in category %}
+              showAlert("{{ message }}", "success");
+            {% else %}
+              showAlert("{{ message }}", "error");
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    });
 
     function clearFilters() {
       filterForm.reset();

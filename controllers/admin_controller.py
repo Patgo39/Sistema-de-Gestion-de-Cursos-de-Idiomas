@@ -14,7 +14,7 @@ def tablero_administrador():
     nombre = session.get('username')
 
     if not nombre:
-        flash("Por favor, inicia sesión primero")
+        flash("Por favor, inicia sesión primero", category="error")
         return redirect(url_for('auth.iniciar_sesion'))
     return render_template('admin/tablero_admin.html')
 
@@ -49,8 +49,7 @@ def gestionar_docentes(id_usuario):
     if request.method == 'GET':
         d = DocenteDao.buscar_por_id(id_usuario)
 
-        docente = [
-            {
+        docente = {
                 "id_usuario": d.id_usuario,
                 "username": d.perfil_usuario.username,
                 "nombre": d.perfil_usuario.nombre,
@@ -66,7 +65,6 @@ def gestionar_docentes(id_usuario):
                 "tiempo_experiencia": d.tiempo_experiencia,
                 "especialidad": d.especialidad
             }
-        ]
         return render_template('admin/editar_docente.html', docente=docente)
 
     elif request.method == 'POST':
@@ -92,16 +90,16 @@ def gestionar_docentes(id_usuario):
             if "fecha_nacimiento" in docente_dict:
                 datetime.strptime(docente_dict["fecha_nacimiento"], "%Y-%m-%d")
         except ValueError:
-            flash("Error: El formato de fecha debe ser YYYY-MM-DD")
+            flash("Error: El formato de fecha debe ser YYYY-MM-DD", category="error")
             return redirect(url_for('admin.gestionar_docentes', id_usuario=id_usuario))
 
         try:
             DocenteDao.actualizar_docente(id_usuario, docente_dict)
-            flash("Datos actualizados correctamente")
+            flash("Datos actualizados correctamente", category="success")
             return redirect(url_for('admin.gestionar_docentes', id_usuario=id_usuario))
         except Exception as e:
             msg = str(e)
-            flash(f"Error: {msg}")
+            flash(f"Error: {msg}", category="error")
             return redirect(url_for('admin.gestionar_docentes', id_usuario=id_usuario))
 
 
@@ -161,11 +159,11 @@ def consultar_docentes():
                 "especialidad": d.especialidad
             } for d in lista_docentes
         ]
-        flash("Datos actualizados correctamente")
+        flash("Datos actualizados correctamente", category="success")
         return jsonify(docentes_json)
     except Exception as e:
         msg = str(e)
-        flash(f"Error: {msg}")
+        flash(f"Error: {msg}", category="error")
         return redirect(url_for('admin.visualizar_docentes'))
 
 @admin_bp.route('/eliminar_docente/<id_usuario>', methods=['GET'])
@@ -173,9 +171,11 @@ def eliminar_docente(id_usuario):
 
     try:
         DocenteDao.eliminar_docente(id_usuario)
+        flash("Docente eliminado correctamente", category="success")
+        return redirect(url_for('admin.visualizar_docentes'))
     except Exception as e:
         flash(f"Error: {e}", category="error")
-        return redirect(url_for('admin.visualizar_docentes'))
+        return redirect(url_for('admin.gestionar_docentes', id_usuario=id_usuario))
 
 @admin_bp.route('/gestionar_alumnos', methods=['GET'])
 def visualizar_alumnos():
@@ -206,8 +206,7 @@ def gestionar_alumnos(id_usuario):
     if request.method == 'GET':
         a = AlumnoDao.buscar_por_id(id_usuario)
 
-        alumno = [
-            {
+        alumno = {
                 "id_usuario": a.id_usuario,
                 "username": a.perfil_usuario.username,
                 "nombre": a.perfil_usuario.nombre,
@@ -221,8 +220,7 @@ def gestionar_alumnos(id_usuario):
                 "ultima_fecha_acceso": a.perfil_usuario.ultima_fecha_acceso.strftime(
                     "%Y-%m-%d") if a.perfil_usuario.ultima_fecha_acceso else None,
                 "grado_actual": a.grado_actual
-            }
-        ]
+        }
         return jsonify(alumno)
 
     elif request.method == 'POST':
@@ -247,16 +245,16 @@ def gestionar_alumnos(id_usuario):
             if "fecha_nacimiento" in alumno_dict:
                 datetime.strptime(alumno_dict["fecha_nacimiento"], "%Y-%m-%d")
         except ValueError:
-            flash("Error: El formato de fecha debe ser YYYY-MM-DD")
+            flash("Error: El formato de fecha debe ser YYYY-MM-DD", category="error")
             return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
 
         try:
             AlumnoDao.actualizar_alumno(id_usuario, alumno_dict)
-            flash("Datos actualizados correctamente")
+            flash("Datos actualizados correctamente", category="success")
             return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
         except Exception as e:
             msg = str(e)
-            flash(f"Error: {msg}")
+            flash(f"Error: {msg}", category="error")
             return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
 
 
@@ -292,7 +290,7 @@ def consultar_alumnos():
                 datetime.strptime(alumno_dict[llave], "%Y-%m-%d")
 
     except ValueError:
-        flash("Error: El formato de fecha debe ser YYYY-MM-DD")
+        flash("Error: El formato de fecha debe ser YYYY-MM-DD", category="error")
         return redirect(url_for('admin.visualizar_alumnos'))
 
     try:
@@ -316,9 +314,21 @@ def consultar_alumnos():
             } for a in lista_alumnos
         ]
 
-        flash("Datos actualizados correctamente")
+        flash("Datos actualizados correctamente", category="success")
         return jsonify(alumnos_json)
     except Exception as e:
         msg = str(e)
-        flash(f"Error: {msg}")
+        flash(f"Error: {msg}", category="error")
         return redirect(url_for('admin.visualizar_alumnos'))
+
+
+@admin_bp.route('/eliminar_alumno/<id_usuario>', methods=['GET'])
+def eliminar_alumno(id_usuario):
+
+    try:
+        AlumnoDao.eliminar_alumno(id_usuario)
+        flash("Alumno eliminado correctamente", category="success")
+        return redirect(url_for('admin.visualizar_alumnos'))
+    except Exception as e:
+        flash(f"Error: {e}", category="error")
+        return redirect(url_for('admin.gestionar_alumnos', id_usuario=id_usuario))
