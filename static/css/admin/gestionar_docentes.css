@@ -1,0 +1,358 @@
+/* --- Contenedor Principal y Scroll --- */
+.main {
+  flex: 1;
+  background: var(--bg-body);
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.main::-webkit-scrollbar {
+  width: 8px;
+}
+.main::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.main::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+/* --- Contenedor de Alertas Integradas --- */
+#alertContainer {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* Estructura base limpia para las alertas */
+.custom-alert {
+  padding: 14px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeInAlert 0.3s ease-out;
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+/* Variante de Error (Rojo) */
+.custom-alert.alert-danger {
+  background-color: #fef2f2;
+  border-left: 4px solid #ef4444;
+  color: #991b1b;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.05);
+}
+
+.custom-alert.alert-danger .close-alert {
+  color: #f87171;
+}
+
+.custom-alert.alert-danger .close-alert:hover {
+  color: #991b1b;
+}
+
+/* Variante de Éxito (Verde) */
+.custom-alert.alert-success {
+  background-color: #f0fdf4;
+  border-left: 4px solid #22c55e;
+  color: #166534;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.05);
+}
+
+.custom-alert.alert-success .close-alert {
+  color: #86efac;
+}
+
+.custom-alert.alert-success .close-alert:hover {
+  color: #166534;
+}
+
+.close-alert {
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+@keyframes fadeInAlert {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Panel de Filtros --- */
+.filter-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.filter-section legend {
+  font-weight: bold;
+  color: var(--primary-color);
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.f-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.f-field label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.f-field input, .f-field select {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  background-color: #fff;
+  transition: border-color 0.2s;
+}
+
+.f-field input:focus, .f-field select:focus {
+  border-color: var(--docente-color);
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 15px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 15px;
+}
+
+.btn-search {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-search:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-clear {
+  background-color: #e2e8f0;
+  color: #475569;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-clear:hover {
+  background-color: #cbd5e1;
+}
+
+.btn-show-all {
+  background-color: #cbd5e1;
+  color: #1e293b;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.btn-show-all:hover {
+  background-color: #94a3b8;
+  color: #ffffff;
+}
+
+/* --- Lista de Docentes --- */
+.docentes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 40px;
+}
+
+.docente-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  border-left: 6px solid var(--docente-color);
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.docente-card:hover {
+  transform: translateX(10px);
+  background: #fdfdfd;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.card-header h3 {
+  font-size: 24px;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.user-id {
+  background: #f0f0f0;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  margin-right: 15px;
+  font-family: monospace;
+}
+
+.card-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.card-body p {
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  background: white;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+  font-style: italic;
+}
+
+/* --- Modal --- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.close {
+  position: absolute;
+  right: 25px; top: 20px;
+  font-size: 30px;
+  color: #aaa;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close:hover { color: #333; }
+
+.modal h2 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.modal hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin-bottom: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.field input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: var(--docente-color);
+}
+
+.modal-footer {
+  margin-top: 30px;
+}
+
+.btn-save {
+  background: var(--docente-color);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.btn-save:hover { background: #1565c0; }

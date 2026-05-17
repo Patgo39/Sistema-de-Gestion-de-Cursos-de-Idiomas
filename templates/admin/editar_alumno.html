@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Alumno - Linguamail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/tablero_admin.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/editar_alumno.css') }}" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2>Linguamail</h2>
+        <hr>
+        <a href="{{ url_for('admin.tablero_administrador') }}">Inicio</a>
+        <a href="{{ url_for('admin.visualizar_docentes') }}">Gestionar Docentes</a>
+        <a href="{{ url_for('admin.visualizar_alumnos') }}" class="active">Gestionar Alumnos</a>
+        <a href="#">Configuración</a>
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="btn-logout">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main">
+      <section class="welcome-header">
+        <h1>Perfil del Alumno: {{ alumno.username }}</h1>
+        <p>Modifica los campos necesarios haciendo clic sobre ellos. Los cambios se habilitarán automáticamente.</p>
+      </section>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div id="alertContainer">
+            {% for message in messages %}
+              <div class="custom-alert {% if 'Error' in message %}alert-danger{% else %}alert-success{% endif %}">
+                <span>{{ message }}</span>
+                <span class="close-alert" onclick="this.parentElement.remove()">&times;</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="form-container">
+        <form id="editAlumnoForm" method="POST" action="{{ url_for('admin.gestionar_alumnos', id_usuario=alumno.id_usuario) }}">
+
+          <div class="edit-grid">
+
+            <div class="edit-field-group">
+              <label for="username">Username</label>
+              <div class="input-wrapper">
+                <input type="text" id="username" name="username" value="{{ alumno.username }}" required />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="email">Correo Electrónico</label>
+              <div class="input-wrapper">
+                <input type="email" id="email" name="email" value="{{ alumno.email }}" required />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="nombre">Nombre(s)</label>
+              <div class="input-wrapper">
+                <input type="text" id="nombre" name="nombre" value="{{ alumno.nombre }}" required />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="apellido_paterno">Apellido Paterno</label>
+              <div class="input-wrapper">
+                <input type="text" id="apellido_paterno" name="apellido_paterno" value="{{ alumno.apellido_paterno }}" required />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="apellido_materno">Apellido Materno</label>
+              <div class="input-wrapper">
+                <input type="text" id="apellido_materno" name="apellido_materno" value="{{ alumno.apellido_materno or '' }}" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="genero">Género</label>
+              <div class="input-wrapper">
+                <select id="genero" name="genero">
+                  <option value="M" {% if alumno.genero == 'M' %}selected{% endif %}>Masculino (M)</option>
+                  <option value="F" {% if alumno.genero == 'F' %}selected{% endif %}>Femenino (F)</option>
+                  <option value="O" {% if alumno.genero == 'O' %}selected{% endif %}>Otro (O)</option>
+                </select>
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="pais">País</label>
+              <div class="input-wrapper">
+                <input type="text" id="pais" name="pais" value="{{ alumno.pais or '' }}" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+              <div class="input-wrapper">
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ alumno.fecha_nacimiento or '' }}" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+            <div class="edit-field-group">
+              <label for="grado_actual">Grado Actual</label>
+              <div class="input-wrapper">
+                <input type="text" id="grado_actual" name="grado_actual" value="{{ alumno.grado_actual or '' }}" />
+                <span class="edit-icon">&#9998;</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="form-actions-footer">
+            <a href="{{ url_for('admin.visualizar_alumnos') }}" class="btn-action btn-back">Volver</a>
+            <button type="submit" id="btnSubmit" class="btn-action btn-update" disabled>Actualizar Alumno</button>
+            <button type="button" class="btn-action btn-delete" onclick="confirmarEliminacion({{ alumno.id_usuario }}, '{{ alumno.username }}')">Eliminar Alumno</button>
+          </div>
+
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const form = document.getElementById('editAlumnoForm');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    const initialState = {};
+
+    // Guardar valores iniciales
+    Array.from(form.elements).forEach(element => {
+      if (element.name) {
+        initialState[element.name] = element.value;
+      }
+    });
+
+    // Validar si algún campo ha cambiado
+    form.addEventListener('input', () => {
+      let hasChanges = false;
+
+      Array.from(form.elements).forEach(element => {
+        if (element.name) {
+          if (element.value !== initialState[element.name]) {
+            hasChanges = true;
+          }
+        }
+      });
+
+      btnSubmit.disabled = !hasChanges;
+    });
+
+    // Función para manejar la eliminación con advertencia previa
+    function confirmarEliminacion(idUsuario, username) {
+      const mensaje = `¿Estás completamente seguro de que deseas eliminar al alumno "${username}"?\n\nEsta acción es permanente y borrará todo su historial del sistema.`;
+
+      if (confirm(mensaje)) {
+        window.location.href = `/admin/eliminar_alumno/${idUsuario}`;
+      }
+    }
+  </script>
+</body>
+</html>

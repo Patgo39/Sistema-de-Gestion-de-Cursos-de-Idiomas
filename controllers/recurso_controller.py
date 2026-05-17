@@ -48,6 +48,3 @@ def subir_recurso(id_curso):
         else:
             flash('Archivo no encontrado o inválido', 'danger')
             return redirect(url_for('recursos.subir_recurso', id_curso=id_curso))
-
-
-

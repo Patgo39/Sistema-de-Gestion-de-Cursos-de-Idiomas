@@ -71,7 +71,7 @@ class UsuarioDao:
                 password=password,
                 genero=genero,
                 pais=pais,
-                rol='docente'
+                rol='Docente'
             )
             db.session.add(nuevo_usuario)
             db.session.flush()
@@ -215,6 +215,8 @@ class UsuarioDao:
         except Exception as e:
             print(f"Error al verificar login: {e}")
             return False
+
+
 
 
 

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Alumnos - Linguamail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/tablero_admin.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/gestionar_alumnos.css') }}" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2>Linguamail</h2>
+        <hr>
+        <a href="{{ url_for('admin.tablero_administrador') }}">Inicio</a>
+        <a href="{{ url_for('admin.visualizar_docentes') }}">Gestionar Docentes</a>
+        <a href="{{ url_for('admin.visualizar_alumnos') }}" class="active">Gestionar Alumnos</a>
+        <a href="#">Configuración</a>
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="btn-logout">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main">
+      <section class="welcome-header">
+        <h1>Gestión de Alumnos</h1>
+        <p>Utiliza los filtros de búsqueda o selecciona un alumno de la lista para editarlo.</p>
+      </section>
+
+      <div id="alertContainer"></div>
+
+      <fieldset class="filter-section">
+        <legend>Filtros de Búsqueda Avanzada</legend>
+        <form id="filterForm">
+          <div class="filter-grid">
+              <div class="f-field">
+                  <label>ID Usuario</label>
+                  <input type="number" name="id_usuario" placeholder="Ej: 12">
+              </div>
+              <div class="f-field">
+                  <label>Username</label>
+                  <input type="text" name="username" placeholder="alumno_juan">
+              </div>
+              <div class="f-field">
+                  <label>Nombre</label>
+                  <input type="text" name="nombre" placeholder="Nombre">
+              </div>
+              <div class="f-field">
+                  <label>A. Paterno</label>
+                  <input type="text" name="apellido_paterno" placeholder="Paterno">
+              </div>
+              <div class="f-field">
+                  <label>A. Materno</label>
+                  <input type="text" name="apellido_materno" placeholder="Materno">
+              </div>
+              <div class="f-field">
+                  <label>Email</label>
+                  <input type="email" name="email" placeholder="correo@ejemplo.com">
+              </div>
+              <div class="f-field">
+                <label>Género</label>
+                <select name="genero" id="filter-genero">
+                    <option value="" selected>Todos / Sin especificar</option>
+                    <option value="M">Masculino (M)</option>
+                    <option value="F">Femenino (F)</option>
+                    <option value="O">Otro (O)</option>
+                </select>
+              </div>
+              <div class="f-field">
+                  <label>País</label>
+                  <input type="text" name="pais" placeholder="México">
+              </div>
+              <div class="f-field">
+                  <label>Grado Actual</label>
+                  <input type="text" name="grado_actual" placeholder="Ej: Principiante, A2, 3er Semestre...">
+              </div>
+
+              <div class="f-field">
+                  <label>Nacimiento (Desde)</label>
+                  <input type="date" name="fecha_nacimiento_min">
+              </div>
+              <div class="f-field">
+                  <label>Nacimiento (Hasta)</label>
+                  <input type="date" name="fecha_nacimiento_max">
+              </div>
+              <div class="f-field">
+                  <label>Último Acceso (Desde)</label>
+                  <input type="date" name="ultima_fecha_acceso_min">
+              </div>
+              <div class="f-field">
+                  <label>Último Acceso (Hasta)</label>
+                  <input type="date" name="ultima_fecha_acceso_max">
+              </div>
+          </div>
+          <div class="filter-actions">
+              <button type="button" class="btn-clear" onclick="clearFilters()">Limpiar Filtros</button>
+              <button type="button" class="btn-show-all" onclick="reloadAllAlumnos()">Mostrar Todos los Alumnos</button>
+              <button type="submit" class="btn-search">Buscar Alumnos</button>
+          </div>
+        </form>
+      </fieldset>
+
+      <div class="alumnos-list" id="alumnosContainer">
+        {% for a in alumnos %}
+        <div class="alumno-card" onclick="redirigirAEditar({{ a.id_usuario }})">
+            <div class="card-header">
+                <span class="user-id">ID: #{{ a.id_usuario }}</span>
+                <h3>{{ a.username }}</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Nombre:</strong> {{ a.nombre }} {{ a.apellido_paterno }} {{ a.apellido_materno }}</p>
+                <p><strong>Grado Actual:</strong> {{ a.grado_actual }}</p>
+                <p><strong>Email:</strong> {{ a.email }}</p>
+                <p><strong>País:</strong> {{ a.pais }}</p>
+                <p><strong>Último Acceso:</strong> {{ a.ultima_fecha_acceso if a.ultima_fecha_acceso else 'N/A' }}</p>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const filterForm = document.getElementById("filterForm");
+    const container = document.getElementById("alumnosContainer");
+
+    // --- Función de Redirección ---
+    function redirigirAEditar(idUsuario) {
+      window.location.href = `/admin/gestionar_alumnos/${idUsuario}`;
+    }
+
+    // --- Petición Asíncrona (AJAX / Fetch) para Filtros ---
+    filterForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(filterForm);
+      const searchParams = {};
+
+      formData.forEach((value, key) => {
+        if(value.trim() !== "") {
+          searchParams[key] = value;
+        }
+      });
+
+      if (Object.keys(searchParams).length === 0) {
+        showAlert("Debe llenar al menos 1 campo para realizar una búsqueda.", "error");
+        return;
+      }
+
+      // Validar Rangos de Fechas
+      const dateRanges = [
+        { min: 'fecha_nacimiento_min', max: 'fecha_nacimiento_max', label: 'Nacimiento' },
+        { min: 'ultima_fecha_acceso_min', max: 'ultima_fecha_acceso_max', label: 'Último Acceso' }
+      ];
+
+      for (const range of dateRanges) {
+        const valMin = searchParams[range.min];
+        const valMax = searchParams[range.max];
+
+        if ((valMin && !valMax) || (!valMin && valMax)) {
+            showAlert(`Para el rango de ${range.label}, debes llenar tanto la fecha 'Desde' como 'Hasta'.`, "error");
+            return;
+        }
+
+        if (valMin && valMax) {
+            const dateMin = new Date(valMin);
+            const dateMax = new Date(valMax);
+
+            if (dateMin > dateMax) {
+                showAlert(`En el rango de ${range.label}, la fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.`, "error");
+                return;
+            }
+        }
+      }
+
+      try {
+        const response = await fetch("{{ url_for('admin.consultar_alumnos') }}", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(searchParams)
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || "Error en la respuesta del servidor");
+        }
+
+        const alumnos = await response.json();
+        renderAlumnos(alumnos);
+
+      } catch (error) {
+        console.error("Error al filtrar:", error);
+        showAlert(error.message || "Hubo un error al procesar la búsqueda.", "error");
+      }
+    });
+
+    // --- Alertas integradas (Soporta dinámicamente clases de éxito y error) ---
+    function showAlert(message, type = "error") {
+      const alertContainer = document.getElementById("alertContainer");
+      alertContainer.innerHTML = "";
+
+      const alertBox = document.createElement("div");
+
+      const alertClass = type === "success" ? "alert-success" : "alert-danger";
+      alertBox.className = `custom-alert ${alertClass}`;
+
+      alertBox.innerHTML = `
+        <span>${message}</span>
+        <span class="close-alert" onclick="this.parentElement.remove()">&times;</span>
+      `;
+
+      alertContainer.appendChild(alertBox);
+
+      setTimeout(() => {
+        if (alertBox.parentElement) {
+          alertBox.style.opacity = "0";
+          setTimeout(() => alertBox.remove(), 300);
+        }
+      }, 5000);
+    }
+
+    // --- Renderizado Dinámico de las Tarjetas ---
+    function renderAlumnos(lista) {
+      container.innerHTML = "";
+
+      if(lista.length === 0) {
+        container.innerHTML = `<div class="no-results">No se encontraron alumnos con los criterios especificados.</div>`;
+        return;
+      }
+
+      lista.forEach(a => {
+        const card = document.createElement("div");
+        card.className = "alumno-card";
+        card.setAttribute("onclick", `redirigirAEditar(${a.id_usuario})`);
+
+        card.innerHTML = `
+            <div class="card-header">
+                <span class="user-id">ID: #${a.id_usuario}</span>
+                <h3>${a.username}</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Nombre:</strong> ${a.nombre} ${a.apellido_paterno} ${a.apellido_materno || ''}</p>
+                <p><strong>Grado Actual:</strong> ${a.grado_actual || 'No asignado'}</p>
+                <p><strong>Email:</strong> ${a.email}</p>
+                <p><strong>País:</strong> ${a.pais || 'N/A'}</p>
+                <p><strong>Último Acceso:</strong> ${a.ultima_fecha_acceso || 'N/A'}</p>
+            </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // --- Lector de mensajes Flash acoplado a categorías de Flask ---
+    window.addEventListener('DOMContentLoaded', () => {
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            {% if 'success' in category or 'message' in category %}
+              showAlert("{{ message }}", "success");
+            {% else %}
+              showAlert("{{ message }}", "error");
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    });
+
+    function clearFilters() {
+      filterForm.reset();
+    }
+
+    function reloadAllAlumnos() {
+      window.location.href = "{{ url_for('admin.visualizar_alumnos') }}";
+    }
+  </script>
+</body>
+</html>

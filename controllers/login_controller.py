@@ -29,14 +29,10 @@ def iniciar_sesion():
                 return redirect(url_for('alumno.tablero_alumno'))
             elif rol_validar == 'docente':
                 return redirect(url_for('docente.tablero_docente'))
-            elif rol_validar in ['admin', 'administrador']:
-                return redirect(url_for('administrador.tablero_admin'))
-            else:
-
-                return redirect(url_for('index'))
+            elif rol_validar == 'administrador':
+                return redirect(url_for('admin.tablero_administrador'))
         else:
-
-            flash("Usuario o contraseñas incorrectos. Intenta de nuevo", "error")
+            flash("Usuario o contraseñas incorrectos. Intenta de nuevo")
             return redirect(url_for('auth.iniciar_sesion'))
 @login_bp.route('/logout')
 def cerrar_sesion():
@@ -49,4 +45,12 @@ def cerrar_sesion():
     return redirect(url_for('auth.iniciar_sesion'))
 
 
-
+@login_bp.route('/logout')
+def cerrar_sesion():
+    '''
+    Metodo para cerrar sesion de usuario (controlador)
+    :return: redirect para cerrar sesion de usuario (controlador)
+    '''
+    session.clear()
+    flash("Has cerrado sesión exitosamente.", 'success')
+    return redirect(url_for('auth.iniciar_sesion'))
