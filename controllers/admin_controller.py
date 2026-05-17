@@ -16,7 +16,21 @@ def tablero_administrador():
     if not nombre:
         flash("Por favor, inicia sesión primero", category="error")
         return redirect(url_for('auth.iniciar_sesion'))
-    return render_template('admin/tablero_admin.html')
+
+    docentes = DocenteDao.buscar_docentes()
+    alumnos = AlumnoDao.buscar_alumnos()
+    # cursos = CursoDao.get_cursos()
+
+    total_docentes = len(docentes)
+    total_alumnos = len(alumnos)
+    total_usuarios = total_docentes + total_alumnos
+    #total_cursos = len(cursos)
+    return render_template('admin/tablero_admin.html',
+                           total_usuarios=total_usuarios,
+                           total_docentes = total_docentes,
+                           total_alumnos = total_alumnos,
+                           total_cursos = 1
+                           )
 
 @admin_bp.route('/gestionar_docentes', methods=['GET'])
 def visualizar_docentes():
