@@ -159,7 +159,6 @@ def consultar_docentes():
                 "especialidad": d.especialidad
             } for d in lista_docentes
         ]
-        flash("Datos actualizados correctamente", category="success")
         return jsonify(docentes_json)
     except Exception as e:
         msg = str(e)
@@ -199,7 +198,7 @@ def visualizar_alumnos():
         } for a in lista_alumnos
     ]
 
-    return jsonify(alumnos_json)
+    return render_template('admin/gestionar_alumnos.html', alumnos=alumnos_json)
 
 @admin_bp.route('/gestionar_alumnos/<id_usuario>', methods=['GET', 'POST'])
 def gestionar_alumnos(id_usuario):
@@ -221,7 +220,7 @@ def gestionar_alumnos(id_usuario):
                     "%Y-%m-%d") if a.perfil_usuario.ultima_fecha_acceso else None,
                 "grado_actual": a.grado_actual
         }
-        return jsonify(alumno)
+        return render_template('admin/editar_alumno.html', alumno=alumno)
 
     elif request.method == 'POST':
         llaves = [
@@ -314,7 +313,6 @@ def consultar_alumnos():
             } for a in lista_alumnos
         ]
 
-        flash("Datos actualizados correctamente", category="success")
         return jsonify(alumnos_json)
     except Exception as e:
         msg = str(e)
