@@ -43,6 +43,50 @@ class CursoDao:
         return Curso.query.all()
 
     @classmethod
+    def obtener_todos_los_cursos(cls):
+        '''
+        Obtener todos los cursos
+        :return:  Lista de cursos en la base de datos
+        '''
+        cursos_db = Curso.query.all()
+        lista_cursos = []
+
+        for curso in cursos_db:
+            inscritos_mapped = []
+            for inscrito in curso.lista_inscritos.all():
+                inscritos_mapped.append({
+                    'id_usuario': inscrito.id_usuario,
+                    'fecha_inscripcion': inscrito.fecha_inscripcion.strftime(
+                        '%Y-%m-%d %H:%M:%S') if inscrito.fecha_inscripcion else None,
+                    'nombre_alumno': inscrito.alumno.nombre if inscrito.alumno else None
+                })
+
+
+            recursos_mapped = []
+            for recurso in curso.lista_recursos.all():
+                recursos_mapped.append({
+                    'id_recurso': recurso.id_recurso,
+                    'titulo_recurso': recurso.titulo_recurso,
+                    'descripcion': recurso.descripcion,
+                    'fecha_subida': recurso.fecha_subida.strftime('%Y-%m-%d') if recurso.fecha_subida else None,
+                    'archivo_url': recurso.archivo_url
+                })
+
+
+            lista_cursos.append({
+                'id_curso': curso.id_curso,
+                'nombre_curso': curso.nombre_curso,
+                'descripcion': curso.descripcion,
+                'nivel': curso.nivel,
+                'docente': curso.docente.nombre if curso.docente else None,
+                'idioma': curso.idioma.nombre if curso.idioma else None,
+                'inscritos': inscritos_mapped,
+                'recursos': recursos_mapped
+            })
+
+        return lista_cursos
+
+    @classmethod
     def buscar_por_id(cls, id_curso):
         '''
         Buscar un curso en la base de datos por id_curso
