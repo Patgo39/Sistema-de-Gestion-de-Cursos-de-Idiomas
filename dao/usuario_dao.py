@@ -115,7 +115,7 @@ class UsuarioDao:
                 password=password,
                 genero=genero,
                 pais=pais,
-                rol='administrador'
+                rol='Administrador'
             )
             db.session.add(nuevo_usuario)
             db.session.flush()
@@ -214,6 +214,34 @@ class UsuarioDao:
                 return None
         except Exception as e:
             print(f"Error al verificar login: {e}")
+            return False
+
+    @staticmethod
+    def existe_username(username):
+        '''
+        Verifica si un nombre de usuario ya existe en la base de datos
+        :param username: El nombre de usuario a verificar
+        :return: Bool (True si ya existe, False si está libre)
+        '''
+        try:
+            usuario = Usuario.query.filter_by(username=username).first()
+            return usuario is not None
+        except Exception as e:
+            print(f"Error al verificar duplicado de username: {e}")
+            return False
+
+    @staticmethod
+    def existe_email(email):
+        '''
+        Verifica si un correo electrónico ya existe en la base de datos
+        :param email: El correo electrónico a verificar
+        :return: Bool (True si ya existe, False si está libre)
+        '''
+        try:
+            usuario = Usuario.query.filter_by(email=email).first()
+            return usuario is not None
+        except Exception as e:
+            print(f"Error al verificar duplicado de email: {e}")
             return False
 
 
