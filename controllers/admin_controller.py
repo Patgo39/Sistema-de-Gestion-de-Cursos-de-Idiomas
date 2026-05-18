@@ -3,6 +3,7 @@ from getopt import error
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for, jsonify
 from dao.alumno_dao import AlumnoDao
 from dao.docente_dao import DocenteDao
+from dao.curso_dao import CursoDao
 from models import Alumno
 from datetime import datetime
 
@@ -19,18 +20,77 @@ def tablero_administrador():
 
     docentes = DocenteDao.buscar_docentes()
     alumnos = AlumnoDao.buscar_alumnos()
-    # cursos = CursoDao.get_cursos()
+    cursos = CursoDao.obtener_todos()
 
     total_docentes = len(docentes)
     total_alumnos = len(alumnos)
     total_usuarios = total_docentes + total_alumnos
-    #total_cursos = len(cursos)
+    total_cursos = len(cursos)
     return render_template('admin/tablero_admin.html',
                            total_usuarios=total_usuarios,
                            total_docentes = total_docentes,
                            total_alumnos = total_alumnos,
-                           total_cursos = 1
+                           total_cursos = total_cursos
                            )
+
+@admin_bp.route('/configuracion', methods=['GET', 'POST'])
+def editar_configuracion():
+    if request.method == 'GET':
+        id_usuario = session['usuario']
+        #a = AdministradorDao.obtener_por_id()
+        a = {}
+        admin = {
+            "id_usuario": a.id_usuario,
+            "username": a.perfil_usuario.username,
+            "nombre": a.perfil_usuario.nombre,
+            "apellido_paterno": a.perfil_usuario.apellido_paterno,
+            "apellido_materno": a.perfil_usuario.apellido_materno,
+            "email": a.perfil_usuario.email,
+            "genero": a.perfil_usuario.genero,
+            "pais": a.perfil_usuario.pais,
+            "fecha_nacimiento": a.perfil_usuario.fecha_nacimiento.strftime(
+                "%Y-%m-%d") if a.perfil_usuario.fecha_nacimiento else None,
+            "ultima_fecha_acceso": a.perfil_usuario.ultima_fecha_acceso.strftime(
+                "%Y-%m-%d") if a.perfil_usuario.ultima_fecha_acceso else None,
+            "nivel_privilegio": a.nivel_privilegio,
+        }
+        return render_template('admin/editar_admin.html', admin=admin)
+    elif request.method == 'POST':
+        id_usuario = session['usuario']
+        llaves = [
+            "username", "nombre", "apellido_paterno", "apellido_materno",
+            "email", "password", "genero", "pais", "fecha_nacimiento",
+            "tiempo_experiencia", "especialidad"
+        ]
+
+        datos_entrada = request.get_json() if request.is_json else request.form
+
+        if not datos_entrada:
+            return redirect(url_for('admin.editar_configuracion'))
+
+        admin_dict = {
+            k: datos_entrada.get(k)
+            for k in llaves
+            if datos_entrada.get(k)
+        }
+
+        try:
+            if "fecha_nacimiento" in admin_dict:
+                datetime.strptime(admin_dict["fecha_nacimiento"], "%Y-%m-%d")
+        except ValueError:
+            flash("Error: El formato de fecha debe ser YYYY-MM-DD", category="error")
+            return redirect(url_for('admin.editar_configuracion'))
+
+        try:
+            #AdminDao.actualizar_administrador(id_usuario, admin_dict)
+            flash("Datos actualizados correctamente", category="success")
+            return redirect(url_for('admin.editar_configuracion'))
+        except Exception as e:
+            msg = str(e)
+            flash(f"Error: {msg}", category="error")
+            return redirect(url_for('admin.editar_configuracion'))
+
+
 
 @admin_bp.route('/gestionar_docentes', methods=['GET'])
 def visualizar_docentes():

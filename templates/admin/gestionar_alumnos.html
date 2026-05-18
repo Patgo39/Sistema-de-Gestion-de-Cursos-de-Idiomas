@@ -15,7 +15,7 @@
         <a href="{{ url_for('admin.tablero_administrador') }}">Inicio</a>
         <a href="{{ url_for('admin.visualizar_docentes') }}">Gestionar Docentes</a>
         <a href="{{ url_for('admin.visualizar_alumnos') }}" class="active">Gestionar Alumnos</a>
-        <a href="#">Configuración</a>
+        <a href="{{ url_for('admin.editar_configuracion') }}">Configuración</a>
         <a href="{{ url_for('auth.cerrar_sesion') }}" class="btn-logout">Cerrar Sesión</a>
     </aside>
 
