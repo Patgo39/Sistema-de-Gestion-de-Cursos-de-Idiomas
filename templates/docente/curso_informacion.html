@@ -7,7 +7,15 @@
 </head>
 <body>
     <div class="layout">
-        <div class="sidebar"></div>
+        <aside class="sidebar">
+            <h2></h2>
+            <hr>
+            <a href="#">Mis Cursos</a>
+            <a href="#">Crear Nuevo Curso</a>
+            <a href="#">Mis Alumnos</a>
+            <a href="#">Mi Perfil</a>
+            <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+        </aside>
         <div class="main">
             <div class="card-header">
                 <h2>{{ curso.nombre_curso }} — Curso #{{ curso.id_curso }}</h2>
