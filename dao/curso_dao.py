@@ -78,8 +78,8 @@ class CursoDao:
                 'nombre_curso': curso.nombre_curso,
                 'descripcion': curso.descripcion,
                 'nivel': curso.nivel,
-                'docente': curso.docente.nombre if curso.docente else None,
-                'idioma': curso.idioma.nombre if curso.idioma else None,
+                'docente': curso.docente.perfil_usuario.nombre if curso.docente and curso.docente.perfil_usuario else None,
+                'idioma': curso.idioma.nombre_idioma if curso.idioma else None,
                 'inscritos': inscritos_mapped,
                 'recursos': recursos_mapped
             })
@@ -166,7 +166,7 @@ class CursoDao:
             return []
     @classmethod
     def buscar_por_id(cls, id_curso):
-        ''' Buscar un curso en la base de datos
+        ''' Buscar un curso en la base de datos por id_curso
         :param id_curso:  id_curso
         :return:  curso en la base de datos
         '''

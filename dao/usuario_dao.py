@@ -141,6 +141,21 @@ class UsuarioDao:
         '''
         return Usuario.query.get(id_usuario)
 
+    @classmethod
+    def buscar_por_username(cls, username):
+        '''
+        Busca un usuario en la base de datos por username
+        :param username:
+        :return: usuario en la base de datos
+        '''
+        try :
+            usuario = Usuario.query.filter_by(username=username).first()
+            return usuario
+        except Exception as e:
+            print(f"Error al buscar usuario: {e}")
+            return None
+
+
     @staticmethod
     def obtener_todos():
         '''
