@@ -5,6 +5,7 @@ from dao.alumno_dao import AlumnoDao
 from dao.docente_dao import DocenteDao
 from dao.curso_dao import CursoDao
 from models import Alumno
+from models import Administrador
 from datetime import datetime
 
 admin_bp = Blueprint('admin', __name__)
@@ -35,10 +36,15 @@ def tablero_administrador():
 
 @admin_bp.route('/configuracion', methods=['GET', 'POST'])
 def editar_configuracion():
+    nombre = session.get('username')
+
+    if not nombre:
+        flash("Por favor, inicia sesión primero", category="error")
+        return redirect(url_for('auth.iniciar_sesion'))
+
     if request.method == 'GET':
         id_usuario = session['usuario']
-        #a = AdministradorDao.obtener_por_id()
-        a = {}
+        a = Administrador.query.filter_by(id_usuario=id_usuario).first()
         admin = {
             "id_usuario": a.id_usuario,
             "username": a.perfil_usuario.username,
@@ -94,6 +100,12 @@ def editar_configuracion():
 
 @admin_bp.route('/gestionar_docentes', methods=['GET'])
 def visualizar_docentes():
+    nombre = session.get('username')
+
+    if not nombre:
+        flash("Por favor, inicia sesión primero", category="error")
+        return redirect(url_for('auth.iniciar_sesion'))
+
     lista_docentes = DocenteDao.buscar_docentes()
 
     docentes_json = [
@@ -120,6 +132,12 @@ def visualizar_docentes():
     return lista_docentes
 @admin_bp.route('/gestionar_docentes/<id_usuario>', methods=['GET', 'POST'])
 def gestionar_docentes(id_usuario):
+    nombre = session.get('username')
+
+    if not nombre:
+        flash("Por favor, inicia sesión primero", category="error")
+        return redirect(url_for('auth.iniciar_sesion'))
+
     if request.method == 'GET':
         d = DocenteDao.buscar_por_id(id_usuario)
 
@@ -242,6 +260,7 @@ def consultar_docentes():
 @admin_bp.route('/eliminar_docente/<id_usuario>', methods=['GET'])
 def eliminar_docente(id_usuario):
 
+
     try:
         DocenteDao.eliminar_docente(id_usuario)
         flash("Docente eliminado correctamente", category="success")
@@ -252,6 +271,12 @@ def eliminar_docente(id_usuario):
 
 @admin_bp.route('/gestionar_alumnos', methods=['GET'])
 def visualizar_alumnos():
+    nombre = session.get('username')
+
+    if not nombre:
+        flash("Por favor, inicia sesión primero", category="error")
+        return redirect(url_for('auth.iniciar_sesion'))
+
     lista_alumnos = AlumnoDao.buscar_alumnos()
 
     alumnos_json = [
@@ -276,6 +301,12 @@ def visualizar_alumnos():
 
 @admin_bp.route('/gestionar_alumnos/<id_usuario>', methods=['GET', 'POST'])
 def gestionar_alumnos(id_usuario):
+    nombre = session.get('username')
+
+    if not nombre:
+        flash("Por favor, inicia sesión primero", category="error")
+        return redirect(url_for('auth.iniciar_sesion'))
+
     if request.method == 'GET':
         a = AlumnoDao.buscar_por_id(id_usuario)
 
