@@ -1,4 +1,4 @@
-from uno import Bool
+
 from datetime import datetime
 from datetime import date
 from db import db
@@ -22,7 +22,7 @@ class AlumnoDao:
         return alumnos
 
     @staticmethod
-    def eliminar_alumno(id_alumno: int) -> Bool:
+    def eliminar_alumno(id_alumno: int) -> bool:
         alumno = AlumnoDao.buscar_por_id(id_alumno)
 
         if not alumno:

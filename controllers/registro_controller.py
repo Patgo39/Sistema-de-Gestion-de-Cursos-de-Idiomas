@@ -42,6 +42,14 @@ def registrar_usuario():
             flash('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.', 'error')
             return redirect(url_for('sign_up.registrar_usuario'))
 
+        if UsuarioDao.existe_username(username):
+            flash('El nombre de usuario ya se encuentra registrado.', 'error')
+            return redirect(url_for('sign_up.registrar_usuario'))
+
+        if UsuarioDao.existe_email(email):
+            flash('El correo electrónico ya se encuentra registrado.', 'error')
+            return redirect(url_for('sign_up.registrar_usuario'))
+
         if rol == 'docente':
             tiempo_experiencia = int(request.form.get('tiempo_experiencia'))
             especialidad = request.form.get('especialidad')
