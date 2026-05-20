@@ -43,4 +43,3 @@ def cerrar_sesion():
     session.clear()
     flash("Has cerrado sesión exitosamente.", 'success')
     return redirect(url_for('auth.iniciar_sesion'))
-
