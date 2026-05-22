@@ -96,5 +96,49 @@
 
     </main>
   </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <script>
+          (function() {
+            const toast = document.createElement('div');
+            toast.innerText = "{{ message }}";
+
+            Object.assign(toast.style, {
+              position: 'fixed',
+              top: '25px',
+              right: '25px',
+              backgroundColor: "{{ '#ef4444' if category == 'error' else '#10b981' }}",
+              color: 'white',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              fontWeight: '600',
+              fontFamily: 'sans-serif',
+              zIndex: '99999',
+              transition: 'opacity 0.4s ease, transform 0.4s ease',
+              opacity: '0',
+              transform: 'translateY(-10px)'
+            });
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+              toast.style.opacity = '1';
+              toast.style.transform = 'translateY(0)';
+            }, 50);
+
+            setTimeout(() => {
+              toast.style.opacity = '0';
+              toast.style.transform = 'translateY(-10px)';
+              setTimeout(() => toast.remove(), 400);
+            }, 1000);
+          })();
+        </script>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
 </body>
 </html>
