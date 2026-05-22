@@ -45,7 +45,7 @@ def tablero_cursos_disponibles_alumno():
     return render_template('alumno/cursos_disponibles.html', cursos_disponibles=cursos_disponibles)
 
 #realiza la inscripcion tras verificar requerimientos
-@alumno_bp.route('/tablero_alumno/cursos_disponibles/<int:id_curso>_inscripcion', methods=['POST'])
+@alumno_bp.route('/tablero_alumno/cursos_disponibles/<int:id_curso>/inscripcion', methods=['POST'])
 def inscripcion_curso_disponibles(id_curso):
     # verificamos la session del alumno
     nombre = session.get('username')
