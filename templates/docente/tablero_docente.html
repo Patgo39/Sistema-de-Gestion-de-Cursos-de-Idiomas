@@ -80,7 +80,7 @@
                     <td>{{ curso.nivel }}</td>
                     <td>
                         <a href="{{ url_for('docente.gestionar_curso_vista', id_curso=curso.id_curso) }}" class="btn-action">Gestionar</a>
-                        <a href="#" class="btn-action">Ver Alumnos</a>
+                        <a href="{{ url_for('docente.curso_docente', id_curso=curso.id_curso) }}" class="btn-action">Ver Alumnos</a>
                     </td>
                 </tr>
                 {% else %}

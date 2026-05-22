@@ -177,3 +177,25 @@ class CursoDao:
             print(f"Error al buscar el curso: {e}")
             return None
 
+    @classmethod
+    def obtener_cursos_disponibles(cls):
+        '''
+        Obtener todos los cursos disponibles con información del docente e idioma
+        :return: Lista de diccionarios con datos de cada curso
+        '''
+        try:
+            cursos = Curso.query.all()
+            return [
+                {
+                    'id_curso': c.id_curso,
+                    'nombre_curso': c.nombre_curso,
+                    'descripcion': c.descripcion,
+                    'nivel': c.nivel,
+                    'docente': c.docente.perfil_usuario.nombre if c.docente and c.docente.perfil_usuario else None,
+                    'idioma': c.idioma.nombre_idioma if c.idioma else None,
+                }
+                for c in cursos
+            ]
+        except Exception as e:
+            print(f"Error al obtener cursos disponibles: {e}")
+            return []
