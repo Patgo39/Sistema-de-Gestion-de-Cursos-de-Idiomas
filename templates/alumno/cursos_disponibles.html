@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cursos Disponibles</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/alumno/cursos_disponibles.css') }}" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2></h2>
+        <hr>
+        <a href="#">Mis Cursos</a>
+        <a href="#">Buscar Profesores</a>
+        <a href="#">Mi Perfil</a>
+        <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}">Ver cursos disponibles</a>
+        <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main">
+        <h2 style="color: #30244D; margin-bottom: 24px;">Cursos Disponibles</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for message in messages %}
+                        <div class="flash-message success">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if cursos_disponibles %}
+            {% for curso in cursos_disponibles %}
+            <div class="curso-card">
+                <div class="curso-header" onclick="toggle({{ loop.index }})">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="curso-titulo">{{ curso.nombre_curso }}</span>
+                        <span class="curso-nivel">{{ curso.nivel or 'Sin nivel' }}</span>
+                    </div>
+                    <span class="curso-id">#{{ curso.id_curso }}</span>
+                </div>
+                <div class="curso-body" id="curso-{{ loop.index }}">
+                    <p><strong>Profesor:</strong> {{ curso.docente or 'Sin asignar' }}</p>
+                    <p><strong>Idioma:</strong> {{ curso.idioma or 'Sin especificar' }}</p>
+                    <p><strong>Descripción:</strong> {{ curso.descripcion or 'Sin descripción' }}</p>
+                    <form action="{{ url_for('alumno.inscripcion_curso_disponibles', id_curso=curso.id_curso) }}" method="POST">
+                        <button type="submit" class="btn">Inscribirse</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No hay cursos disponibles en este momento.</p>
+        {% endif %}
+    </main>
+  </div>
+
+  <script>
+    function toggle(index) {
+        const todos = document.querySelectorAll('.curso-body');
+        todos.forEach((body, i) => {
+            if (i + 1 === index) {
+                body.classList.toggle('abierto');
+            } else {
+                body.classList.remove('abierto');
+            }
+        });
+    }
+  </script>
+</body>
+</html>

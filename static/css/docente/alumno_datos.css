@@ -1,0 +1,95 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: sans-serif;
+    background: #f4f4f8;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.layout {
+    display: flex;
+    width: 700px;
+    height: 70vh;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+.sidebar {
+    width: 160px;
+    min-width: 160px;
+    background-color: #30244D;
+    padding: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+}
+.sidebar a:hover {
+    background: rgba(255,255,255,0.2);
+}
+.main {
+    flex: 1;
+    background: #ffffff;
+    padding: 48px 32px;
+}
+.card-header {
+    margin-bottom: 32px;
+    border-bottom: 1px solid #e0dce8;
+    padding-bottom: 20px;
+}
+.card-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #30244D;
+}
+.info-field {
+    margin-bottom: 16px;
+}
+.info-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+.info-field p {
+    font-size: 15px;
+    color: #333;
+}
+.divider {
+    border: none;
+    border-top: 1px solid #e0dce8;
+    margin: 28px 0;
+}
+.btn-danger {
+    height: 44px;
+    padding: 0 24px;
+    background-color: #c0392b;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+.btn-danger:hover {
+    background-color: #a93226;
+}
+.btn-danger:active {
+    transform: scale(0.98);
+}

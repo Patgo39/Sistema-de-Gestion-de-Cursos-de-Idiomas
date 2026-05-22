@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ alumno.nombre_completo }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/docente/alumno_datos.css') }}">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2></h2>
+            <hr>
+            <a href="#">Mis Cursos</a>
+            <a href="#">Crear Nuevo Curso</a>
+            <a href="#">Mis Alumnos</a>
+            <a href="#">Mi Perfil</a>
+            <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+        </aside>
+        <div class="main">
+            <div class="card-header">
+                <h2>{{ alumno.nombre_completo }}</h2>
+            </div>
+
+            <div class="info-field">
+                <label>ID</label>
+                <p>{{ id_usuario }}</p>
+            </div>
+            <div class="info-field">
+                <label>Email</label>
+                <p>{{ alumno.email }}</p>
+            </div>
+            <div class="info-field">
+                <label>Género</label>
+                <p>{{ alumno.genero }}</p>
+            </div>
+            <div class="info-field">
+                <label>Grado actual</label>
+                <p>{{ alumno.grado_actual }}</p>
+            </div>
+
+            <hr class="divider">
+
+            <button type="button" class="btn-danger" onclick="document.getElementById('modal').style.display='flex'">
+                Eliminar alumno
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+         background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:100;">
+        <div style="background:#fff; border-radius:16px; padding:36px 32px; max-width:400px;
+                    width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.2); text-align:center;">
+            <p style="font-size:15px; color:#333; margin-bottom:28px;">
+                ¿Desea eliminar del curso <strong>{{ curso.nombre_curso }}</strong> a <strong>{{ alumno.nombre_completo }}</strong>?
+            </p>
+            <div style="display:flex; gap:12px; justify-content:center;">
+                <button onclick="document.getElementById('modal').style.display='none'"
+                        style="height:40px; padding:0 20px; border:1px solid #d0cad8; border-radius:10px;
+                               background:#fff; color:#555; cursor:pointer; font-size:14px;">
+                    Cancelar
+                </button>
+                <form action="{{ url_for('docente.eliminar_alumno', id_curso=id_curso, id_alumno=id_usuario) }}" method="POST">
+                    <button type="submit" class="btn-danger">Confirmar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
