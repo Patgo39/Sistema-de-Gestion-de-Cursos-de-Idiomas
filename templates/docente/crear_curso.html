@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear Nuevo Curso - Linguamail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/docente/crear_curso.css', v='1.2') }}" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2>Linguamail</h2>
+        <hr>
+        <a href="{{ url_for('docente.tablero_docente') }}" class="active">Panel Principal</a>
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="btn-logout">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main">
+      <section class="welcome-header">
+        <h1>Crear Nuevo Curso</h1>
+        <p>Completa la información requerida para registrar un nuevo grupo en el sistema.</p>
+      </section>
+
+      <div id="alertContainer">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="custom-alert {% if category == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="form-container">
+        <form action="{{ url_for('docente.crear_curso_procesar') }}" method="POST">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nombre_curso">Nombre del Curso</label>
+              <input type="text" id="nombre_curso" name="nombre_curso" value="{{ nombre_curso or '' }}" placeholder="Ej. Inglés Básico" required />
+            </div>
+
+            <div class="form-group">
+              <label for="nivel">Nivel Técnico</label>
+              <input type="text" id="nivel" name="nivel" value="{{ nivel or '' }}" placeholder="Ej. A1, B2, Avanzado" required />
+            </div>
+
+            <div class="form-group full-width">
+              <label for="nombre_idioma">Idioma del Curso</label>
+              <input type="text" id="nombre_idioma" name="nombre_idioma" value="{{ nombre_idioma or '' }}" placeholder="Ej. Inglés, Francés, Alemán..." list="lista-idiomas" autocomplete="off" required />
+
+              <datalist id="lista-idiomas">
+                {% for idioma in idiomas %}
+                  <option value="{{ idioma.nombre_idioma }}"></option>
+                {% endfor %}
+              </datalist>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="descripcion">Descripción Completa del Curso</label>
+              <textarea id="descripcion" name="descripcion" rows="4" placeholder="Escribe aquí los objetivos o características generales del curso..." required>{{ descripcion or '' }}</textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <a href="{{ url_for('docente.tablero_docente') }}" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn-submit">Aceptar y Crear</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

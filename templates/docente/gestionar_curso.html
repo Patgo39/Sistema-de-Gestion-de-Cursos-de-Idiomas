@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestionar Curso - Linguamail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/docente/gestionar_curso.css', v='1.3') }}" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2>Linguamail</h2>
+        <hr>
+        <a href="{{ url_for('docente.tablero_docente') }}" class="active">Panel Principal</a>
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="btn-logout">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main">
+      <section class="welcome-header">
+        <h1>Gestión del Curso</h1>
+        <p>Modifica la información general o da de baja este curso de la plataforma.</p>
+      </section>
+
+      <div id="alertContainer">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="custom-alert {% if category == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="form-container">
+        <form id="cursoForm" action="{{ url_for('docente.actualizar_curso_procesar', id_curso=curso.id_curso) }}" method="POST">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nombre_curso">Nombre del Curso</label>
+              <input type="text" id="nombre_curso" name="nombre_curso" value="{{ curso.nombre_curso }}" required />
+            </div>
+
+            <div class="form-group">
+              <label for="nivel">Nivel Técnico</label>
+              <input type="text" id="nivel" name="nivel" value="{{ curso.nivel }}" required />
+            </div>
+
+            <div class="form-group full-width">
+              <label for="nombre_idioma">Idioma del Curso</label>
+              <input type="text" id="nombre_idioma" name="nombre_idioma" value="{{ curso.idioma.nombre_idioma }}" list="lista-idiomas" autocomplete="off" required />
+
+              <datalist id="lista-idiomas">
+                {% for idioma in idiomas %}
+                  <option value="{{ idioma.nombre_idioma }}"></option>
+                {% endfor %}
+              </datalist>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="descripcion">Descripción del Curso</label>
+              <textarea id="descripcion" name="descripcion" rows="4" required>{{ curso.descripcion }}</textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <a href="{{ url_for('docente.tablero_docente') }}" class="btn-back">Volver</a>
+
+            <div class="actions-right">
+              <button type="button" class="btn-delete" onclick="confirmarEliminacion()">Eliminar Curso</button>
+              <button type="submit" id="btnUpdate" class="btn-update" disabled>Actualizar Curso</button>
+            </div>
+          </div>
+        </form>
+
+        <form id="deleteForm" action="{{ url_for('docente.eliminar_curso_procesar', id_curso=curso.id_curso) }}" method="POST" style="display: none;">
+        </form>
+
+        <section class="recursos-section">
+          <h2>Materiales Didácticos del Curso</h2>
+
+          <table class="table-recursos">
+            <thead>
+              <tr>
+                <th>Título del Material</th>
+                <th>Descripción</th>
+                <th>Fecha de Carga</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if recursos %}
+                {% for recurso in recursos %}
+                  <tr>
+                    <td><strong>{{ recurso.titulo_recurso }}</strong></td>
+                    <td>{{ recurso.descripcion or 'Sin descripción disponible' }}</td>
+                    <td>{{ recurso.fecha_subida.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                      <a href="{{ recurso.archivo_url }}" target="_blank" class="btn-download">Ver Archivo</a>
+                      &nbsp;|&nbsp;
+                      <form action="{{ url_for('docente.eliminar_recurso_procesar', id_curso=curso.id_curso, id_recurso=recurso.id_recurso) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este material de forma permanente?');">
+                        <button type="submit" class="btn-delete-recurso">Eliminar</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="4" class="no-data">Aún no se han subido materiales didácticos para este curso.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+
+          <div class="card-upload">
+            <h3>+ Cargar Nuevo Material al Curso</h3>
+            <form action="{{ url_for('docente.subir_recurso_procesar', id_curso=curso.id_curso) }}" method="POST" enctype="multipart/form-data">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="titulo_recurso">Título del Recurso *</label>
+                  <input type="text" id="titulo_recurso" name="titulo_recurso" placeholder="Ej. Lectura Pasado Simple" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="archivo_fisico">Seleccionar Archivo (PDF, DOCX, PPTX) *</label>
+                  <input type="file" id="archivo_fisico" name="archivo_fisico" accept=".pdf,.doc,.docx,.ppt,.pptx" required />
+                </div>
+
+                <div class="form-group full-width">
+                  <label for="descripcion_recurso">Breve Descripción del Material</label>
+                  <textarea id="descripcion_recurso" name="descripcion_recurso" rows="2" placeholder="Escribe notas aclaratorias del archivo para tus alumnos..."></textarea>
+                </div>
+              </div>
+
+              <div style="margin-top: 15px; text-align: right;">
+                <button type="submit" class="btn-upload-submit">
+                  Subir Material
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const form = document.getElementById('cursoForm');
+    const btnUpdate = document.getElementById('btnUpdate');
+
+    form.addEventListener('input', () => {
+        btnUpdate.disabled = false;
+    });
+
+    function confirmarEliminacion() {
+        if (confirm("¿Estás completamente seguro de que deseas eliminar este curso? Esta acción es irreversible.")) {
+            document.getElementById('deleteForm').submit();
+        }
+    }
+  </script>
+</body>
+</html>
