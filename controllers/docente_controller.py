@@ -1,3 +1,4 @@
+
 import os
 import uuid
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for
@@ -5,8 +6,10 @@ from supabase import create_client, Client
 from db import db
 from dao.curso_dao import CursoDao
 from dao.recurso_dao import RecursoDao
+from dao.inscribir_dao import InscribirDao
 from models.curso import Curso
 from models.idioma import Idioma
+
 docente_bp = Blueprint('docente', __name__)
 
 # Carga segura de credenciales de Supabase desde las variables de entorno del sistema (.env)
@@ -80,7 +83,6 @@ def gestionar_curso_vista(id_curso):
     if 'username' not in session or session.get('rol').lower() != 'docente':
         flash("Acceso denegado. Debes iniciar sesión como docente.")
         return redirect(url_for('auth.iniciar_sesion'))
-
     curso = CursoDao.buscar_por_id(id_curso)
     if not curso:
         flash("El curso solicitado no existe.", category="error")
@@ -95,6 +97,58 @@ def gestionar_curso_vista(id_curso):
                            curso=curso,
                            idiomas=todos_los_idiomas,
                            recursos=materiales_del_curso)
+
+#Obtiene informacion sobre un curso: nombre, id del curso, lista de alumnos
+@docente_bp.route('/tablero_docente/curso_docente/<int:id_curso>', methods=['GET'])
+def curso_docente(id_curso):
+    #Verificamos la session del docente
+    if not session.get('username'):
+        flash("Por favor, inicia sesión primero")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    #informacion general y lista de alumnos inscritos al curso
+    lista_inscripcion = InscribirDao.consultar_lista_inscripcion(id_curso)
+    curso = CursoDao.buscar_por_id(id_curso)
+
+    if not curso:
+        flash("Curso no encontrado")
+        return redirect(url_for('docente.tablero_docente'))
+
+    return render_template('docente/curso_informacion.html', lista_inscripcion = lista_inscripcion, curso = curso)
+
+#Obtiene los datos de un alumno inscrito al curso
+@docente_bp.route('/tablero_docente/curso_docente/<int:id_curso>/alumno/<int:id_usuario>', methods=['GET'])
+def datos_alumno(id_curso, id_usuario):
+    # Verificamos la session del docente
+    if not session.get('username'):
+        flash("Por favor, inicia sesión primero")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    #datos del alumno seleccionado
+    alumno = InscribirDao.consultar_alumno_inscripcion(id_usuario, id_curso)
+    curso = CursoDao.buscar_por_id(id_curso)
+    if not alumno:
+        flash("Alumno no encontrado en este curso")
+        return redirect(url_for('docente.curso_docente', id_curso = id_curso))
+    return render_template('docente/alumno_datos.html', alumno = alumno, id_usuario = id_usuario, id_curso = id_curso, curso = curso)
+
+#Docente elimina a alumno de un curso
+@docente_bp.route('/tablero_docente/curso_docente/<int:id_curso>/alumno/<int:id_alumno>/eliminar', methods=['POST'])
+def eliminar_alumno(id_curso, id_alumno):
+    # Verificamos la session del docente
+    if not session.get('username'):
+        flash("Por favor, inicia sesión primero")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    #eliminar alumno
+    alumno_eliminado = InscribirDao.eliminar_inscripcion(id_alumno, id_curso)
+    if alumno_eliminado:
+        flash("Alumno eliminado en este curso.")
+    else:
+        flash("No se puedo eliminar al alumno.")
+
+    return redirect(url_for('docente.curso_docente', id_curso = id_curso))
+
 
 
 @docente_bp.route('/actualizar_curso_procesar/<int:id_curso>', methods=['POST'])
