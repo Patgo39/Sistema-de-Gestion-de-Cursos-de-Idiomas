@@ -69,7 +69,8 @@ def crear_curso_procesar():
             db.session.commit()
             id_idioma = nuevo_idioma.id_idioma
 
-        CursoDao.guardar_curso(nombre_curso, nivel, descripcion, id_idioma, id_docente)
+        CursoDao.crear_curso(nombre_curso, descripcion, nivel, id_docente, id_idioma)
+
         flash("Curso creado con éxito.", category="success")
         return redirect(url_for('docente.tablero_docente'))
 
