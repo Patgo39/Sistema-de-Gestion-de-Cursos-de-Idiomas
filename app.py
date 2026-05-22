@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, render_template, request
 from db import db
 import os
 from dotenv import load_dotenv
@@ -7,13 +7,13 @@ from controllers.recurso_controller import recursos_bp
 from controllers.registro_controller import registro_bp
 from controllers.alumno_controller import alumno_bp
 from controllers.docente_controller import docente_bp
+from controllers.admin_controller import admin_bp
 from datetime import timedelta
 
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
-
 app.config['UPLOAD_FOLDER'] = 'static/uploads/recursos'
 user = os.getenv('DB_USER')
 password = os.getenv('DB_PASS')
@@ -25,17 +25,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 db.init_app(app)
-
 app.register_blueprint(login_bp, url_prefix='/auth')
 app.register_blueprint(registro_bp, url_prefix='/sign_up')
 app.register_blueprint(alumno_bp, url_prefix='/alumno')
 app.register_blueprint(docente_bp, url_prefix='/docente')
 
 app.register_blueprint(recursos_bp, url_prefix='/recursos')
+app.register_blueprint(admin_bp, url_prefix='/admin')
 
 @app.route('/')
 def index():
-    return redirect(url_for('auth.iniciar_sesion'))
+    return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port=5000, debug=True)
+      app.run(host="127.0.0.1", port=5000, debug=True)

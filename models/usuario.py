@@ -9,7 +9,7 @@ class Usuario(db.Model):
     apellido_materno = db.Column(db.String(50))
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(255))
-    genero=db.Column(db.String(1))
+    genero=db.Column(db.String(1)) #
     pais=db.Column(db.String(50))
     fecha_nacimiento = db.Column(db.Date)
     ultima_fecha_acceso=db.Column(db.DateTime)

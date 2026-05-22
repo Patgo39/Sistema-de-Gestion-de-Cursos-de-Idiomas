@@ -1,0 +1,198 @@
+/* --- Variables de Color --- */
+:root {
+  --primary-color: #30244D;
+  --primary-hover: #3e3063;
+  --docente-color: #1976d2;
+  --alumno-color: #388e3c;
+  --curso-color: #f57c00;
+  --bg-body: #f4f4f8;
+  --white: #ffffff;
+}
+
+/* --- Reset y Estructura Base --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: sans-serif;
+  background: var(--bg-body);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  overflow: hidden;
+}
+
+.layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* --- Barra Lateral (Sidebar) --- */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background-color: var(--primary-color);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  color: white;
+}
+
+.sidebar h2 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.sidebar hr {
+  opacity: 0.2;
+  margin-bottom: 15px;
+}
+
+.sidebar a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: block;
+}
+
+.sidebar a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateX(5px);
+}
+
+.sidebar .btn-logout {
+  margin-top: auto;
+  color: #ff6b6b;
+  cursor: pointer;
+}
+
+/* --- Área Principal --- */
+.main {
+  flex: 1;
+  background: var(--bg-body);
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.welcome-header {
+  margin-bottom: 32px;
+}
+
+.welcome-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.welcome-header p {
+  font-size: 16px;
+  color: #666;
+}
+
+/* --- Cuadrícula de KPIs --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+/* --- Estilo de las Cards --- */
+.kpi-card {
+  background: var(--white);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.3s ease;
+  border-top: 5px solid transparent;
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px);
+}
+
+.kpi-card p {
+  color: #888;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.kpi-card h2 {
+  font-size: 36px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.kpi-card small {
+  color: #777;
+  font-size: 13px;
+}
+
+/* --- Colores Específicos por Card --- */
+.card-total { border-top-color: var(--primary-color); }
+.card-total h2 { color: var(--primary-color); }
+
+.card-docentes { border-top-color: var(--docente-color); }
+.card-docentes h2 { color: var(--docente-color); }
+
+.card-alumnos { border-top-color: var(--alumno-color); }
+.card-alumnos h2 { color: var(--alumno-color); }
+
+.card-cursos { border-top-color: var(--curso-color); }
+.card-cursos h2 { color: var(--curso-color); }
+
+/* --- Barras de Progreso --- */
+.progress-container {
+  background: #f0f0f0;
+  height: 8px;
+  border-radius: 10px;
+  width: 90%;
+  margin: 15px auto;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 0.8s ease-in-out;
+}
+
+.bar-docente { background-color: var(--docente-color); }
+.bar-alumno { background-color: var(--alumno-color); }
+
+/* --- Animación Flash y Otros --- */
+.flash-message {
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.flash-message.success {
+  background-color: #f0fff4;
+  color: #2f855a;
+  border: 1px solid #9ae6b4;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

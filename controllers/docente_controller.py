@@ -7,7 +7,6 @@ from dao.curso_dao import CursoDao
 from dao.recurso_dao import RecursoDao
 from models.curso import Curso
 from models.idioma import Idioma
-
 docente_bp = Blueprint('docente', __name__)
 
 # Carga segura de credenciales de Supabase desde las variables de entorno del sistema (.env)
