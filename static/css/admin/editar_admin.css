@@ -1,0 +1,171 @@
+/* --- Contenedor del Formulario --- */
+.form-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    margin-top: 1.5rem;
+}
+
+/* Grid de dos columnas para los campos de edición */
+.edit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Grupos de campos individuales */
+.edit-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.edit-field-group label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+/* Wrapper para acoplar el Input y el ícono de edición a un lado */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #334155;
+    background-color: #f8fafc;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efecto focus simulando edición activa del admin */
+.input-wrapper input:focus,
+.input-wrapper select:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+/* Icono de lápiz indicador al lado de cada campo */
+.edit-icon {
+    position: absolute;
+    right: 0.75rem;
+    color: #94a3b8;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: color 0.2s ease;
+}
+
+.input-wrapper input:focus + .edit-icon,
+.input-wrapper select:focus + .edit-icon {
+    color: #8b5cf6;
+}
+
+/* --- Botonera Inferior (Footer del Formulario) --- */
+.form-actions-footer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Base de botones de acción */
+.btn-action {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Botón Volver */
+.btn-back {
+    background-color: #64748b;
+    color: #ffffff;
+}
+
+.btn-back:hover {
+    background-color: #475569;
+}
+
+/* Botón Actualizar */
+.btn-update {
+    background-color: #10b981;
+    color: #ffffff;
+}
+
+.btn-update:hover:not(:disabled) {
+    background-color: #059669;
+}
+
+/* Estado Desactivado (Cuando no hay cambios) */
+.btn-update:disabled {
+    background-color: #a7f3d0;
+    color: #d1fae5;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Botón Eliminar Activo */
+.btn-delete {
+    background-color: #ef4444;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+}
+
+/* --- Alertas de Éxito / Error Flash --- */
+#alertContainer {
+    margin-bottom: 1rem;
+}
+
+.custom-alert {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+}
+
+.close-alert {
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    line-height: 1;
+}

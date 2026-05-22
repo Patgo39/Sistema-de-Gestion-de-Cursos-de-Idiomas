@@ -4,6 +4,8 @@ from dao.inscribir_dao import InscribirDao
 from dao.usuario_dao import UsuarioDao
 from models.dominar import Dominar
 
+from dao.curso_dao import CursoDao
+
 alumno_bp = Blueprint('alumno', __name__)
 
 @alumno_bp.route('/tablero_alumno', methods=['GET'])
@@ -20,6 +22,7 @@ def tablero_alumno():
     id_usuario = session.get('usuario')
     cursos_inscritos = CursoDao.obtener_cursos_por_alumno(id_usuario)
     return render_template('alumno/tablero_alumno.html', nombre=nombre, cursos=cursos_inscritos)
+
 
 #obtiene todos los cursos menos los que ya esta inscrito
 @alumno_bp.route('/tablero_alumno/cursos_disponibles', methods=['GET'])

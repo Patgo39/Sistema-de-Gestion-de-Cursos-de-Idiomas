@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Administración</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/tablero_admin.css', v='1.0') }}" />
+</head>
+<body>
+  <div class="layout">
+
+    <aside class="sidebar">
+        <h2>Linguamail</h2>
+        <hr>
+        <a href="{{ url_for('admin.tablero_administrador') }}">Inicio</a>
+        <a href="{{ url_for('admin.visualizar_docentes') }}">Gestionar Docentes</a>
+        <a href="{{ url_for('admin.visualizar_alumnos') }}">Gestionar Alumnos</a>
+        <a href="{{ url_for('admin.editar_configuracion') }}">Configuración</a>
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="btn-logout">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main">
+      <section class="welcome-header">
+        <h1>¡Bienvenido, {{ session['username'] }}!</h1>
+        <p>Has iniciado sesión como <strong>Administrador</strong>. Aquí está el resumen global.</p>
+      </section>
+
+      <div class="stats-grid">
+
+          <div class="kpi-card card-total">
+              <p>Usuarios Registrados</p>
+              <h2>{{ total_usuarios|default(0) }}</h2>
+              <small>Cuentas totales</small>
+          </div>
+
+          <div class="kpi-card card-docentes">
+              <p>Docentes</p>
+              <h2>{{ total_docentes|default(0) }}</h2>
+              <div class="progress-container">
+                  {% set u_total = total_usuarios|default(0) %}
+                  {% set d_total = total_docentes|default(0) %}
+                  <div class="progress-bar bar-docente"
+                       style="width: {{ (d_total / u_total * 100) if u_total > 0 else 0 }}%">
+                  </div>
+              </div>
+              <small>{{ total_docentes|default(0) }} profesionales</small>
+          </div>
+
+          <div class="kpi-card card-alumnos">
+              <p>Alumnos</p>
+              <h2>{{ total_alumnos|default(0) }}</h2>
+              <div class="progress-container">
+                  {% set a_total = total_alumnos|default(0) %}
+                  <div class="progress-bar bar-alumno"
+                       style="width: {{ (a_total / u_total * 100) if u_total > 0 else 0 }}%">
+                  </div>
+              </div>
+              <small>{{ total_alumnos|default(0) }} estudiantes</small>
+          </div>
+
+          <div class="kpi-card card-cursos">
+              <p>Cursos Activos</p>
+              <h2>{{ total_cursos|default(0) }}</h2>
+              <small style="font-weight: bold; color: var(--curso-color); cursor: default;">Modo lectura</small>
+          </div>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>

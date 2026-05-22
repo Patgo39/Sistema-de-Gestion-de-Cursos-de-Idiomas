@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicio - Plataforma</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}" />
+  <style>
+      .sidebar { padding: 20px; color: white; display: flex; flex-direction: column; gap: 20px; justify-content: center; text-align: center; width: 350px;}
+      .welcome-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+      .buttons { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
+      .btn { padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; font-size: 1rem; }
+      .btn-login { background-color: rebeccapurple; color: white; border: 2px solid #333; }
+      .btn-login:hover { background-color: #555; border-color: #555; }
+      .btn-register {  background-color: rebeccapurple;; color: white; border: 2px solid #333;}
+      .btn-register:hover { background-color: #555; border-color: #555; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+        <h2>Plataforma de Cursos</h2>
+        <p style="opacity: 0.8; font-size: 0.9rem;">Tu espacio para aprender y gestionar idiomas</p>
+    </aside>
+
+    <main class="main" style="padding: 40px; align-items: center; justify-content: center;">
+      <div class="welcome-card" style="max-width: 500px; width: 100%;">
+
+        <h1 style="color: #333; margin-bottom: 15px;">¡Bienvenido!</h1>
+        <p style="color: #666; font-size: 1.1rem; line-height: 1.5;">
+            Ingresa a tu cuenta para continuar con tu progreso o crea una cuenta nueva si aún no formas parte de la plataforma.
+        </p>
+
+        <div class="buttons">
+            <a href="{{ url_for('auth.iniciar_sesion') }}" class="btn btn-login">Iniciar Sesión</a>
+            <a href="{{ url_for('sign_up.registrar_usuario') }}" class="btn btn-register">Registrarse</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>
