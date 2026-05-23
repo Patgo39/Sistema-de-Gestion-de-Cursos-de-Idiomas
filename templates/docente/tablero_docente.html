@@ -31,10 +31,10 @@
     <aside class="sidebar">
         <h2></h2>
         <hr>
-        <a href="#">Mis Cursos</a>
+        <a href="{{ url_for('docente.mis_cursos_docente') }}">Mis Cursos</a>
         <a href="{{ url_for('docente.crear_curso_vista') }}" class="btn-primary">Crear Nuevo Curso</a>
         <a href="#">Mis Alumnos</a>
-        <a href="#">Mi Perfil</a>
+        <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
         <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
     </aside>
 
@@ -59,40 +59,8 @@
         </div>
       </div>
 
-      <div class="welcome-card" style="width: 100%;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0;">Cursos que impartes</h2>
-            <a href="{{ url_for('docente.crear_curso_vista') }}" class="btn-primary">+ Nuevo Curso</a>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre del Curso</th>
-                    <th>Nivel</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for curso in cursos %}
-                <tr>
-                    <td><strong>{{ curso.nombre_curso }}</strong></td>
-                    <td>{{ curso.nivel }}</td>
-                    <td>
-                        <a href="{{ url_for('docente.gestionar_curso_vista', id_curso=curso.id_curso) }}" class="btn-action">Gestionar</a>
-                        <a href="{{ url_for('docente.curso_docente', id_curso=curso.id_curso) }}" class="btn-action">Ver Alumnos</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="3" style="text-align: center; color: #777; padding: 30px;">
-                        Aún no tienes cursos creados. Haz clic en "+ Nuevo Curso" para empezar.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-      </div>
+        <!-- Lista de cursos: usar plantilla compartida -->
+        {% include 'curso_lista.html' %}
 
     </main>
   </div>

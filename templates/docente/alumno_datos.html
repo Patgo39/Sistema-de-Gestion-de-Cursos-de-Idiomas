@@ -13,7 +13,7 @@
             <a href="#">Mis Cursos</a>
             <a href="#">Crear Nuevo Curso</a>
             <a href="#">Mis Alumnos</a>
-            <a href="#">Mi Perfil</a>
+            <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
             <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
         </aside>
         <div class="main">

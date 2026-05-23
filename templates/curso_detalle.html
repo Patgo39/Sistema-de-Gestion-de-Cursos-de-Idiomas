@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{ curso.nombre_curso if curso else 'Curso' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/docente/curso_informacion.css') }}">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h2></h2>
+        <hr>
+        {% if role == 'docente' %}
+          <a href="{{ url_for('docente.tablero_docente') }}">Tablero Principal</a>
+          <a href="{{ url_for('docente.mis_cursos_docente') }}">Mis Cursos</a>
+          <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
+        {% else %}
+          <a href="{{ url_for('alumno.tablero_alumno') }}">Tablero Principal</a>
+          <a href="{{ url_for('alumno.mis_cursos') }}">Mis Cursos</a>
+          <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}">Ver cursos disponibles</a>
+          <a href="{{ url_for('alumno.perfil') }}">Mi Perfil</a>
+        {% endif %}
+        <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+      </aside>
+
+      <main class="main">
+        <div class="card-header">
+          <h2>{{ curso.nombre_curso }} — Curso #{{ curso.id_curso }}</h2>
+          <p>{{ curso.descripcion }}</p>
+        </div>
+
+        <section style="margin-top:20px; display:flex; gap:20px;">
+          <div style="flex:1;">
+            <h3>Materiales</h3>
+            {% if recursos %}
+              <ul>
+                {% for r in recursos %}
+                  <li>
+                    <a href="{{ r.archivo_url }}" target="_blank">{{ r.titulo_recurso }}</a>
+                    <small style="color:#666;"> — {{ r.descripcion or '' }}</small>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>No hay materiales para este curso.</p>
+            {% endif %}
+
+            {% if role == 'docente' %}
+              <hr>
+              <h4>Subir nuevo material</h4>
+              <form action="{{ url_for('docente.subir_recurso_procesar', id_curso=curso.id_curso) }}" method="POST" enctype="multipart/form-data">
+                <input type="text" name="titulo_recurso" placeholder="Título" required />
+                <br/>
+                <textarea name="descripcion_recurso" placeholder="Descripción"></textarea>
+                <br/>
+                <input type="file" name="archivo_fisico" required />
+                <br/>
+                <button type="submit">Subir</button>
+              </form>
+            {% endif %}
+          </div>
+
+          <div style="width:320px;">
+            <h3>Información</h3>
+            <p><strong>Nivel:</strong> {{ curso.nivel }}</p>
+            <p><strong>Idioma:</strong> {{ curso.idioma.nombre_idioma if curso.idioma else '' }}</p>
+
+            {% if role == 'docente' and lista_inscripcion %}
+              <hr>
+              <h4>Alumnos inscritos</h4>
+              <ol>
+                {% for a in lista_inscripcion %}
+                  <li>
+                    <a href="{{ url_for('docente.datos_alumno', id_curso=curso.id_curso, id_usuario=a.id_usuario) }}">{{ a.nombre_completo }}</a>
+                  </li>
+                {% endfor %}
+              </ol>
+            {% endif %}
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

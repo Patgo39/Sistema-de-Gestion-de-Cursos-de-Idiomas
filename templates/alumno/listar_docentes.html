@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buscar Profesores</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}">
+  <style>
+    .list { display: grid; gap: 12px; }
+    .card { background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .meta { color: #666; font-size: 0.95rem; }
+    .actions { margin-top: 8px; }
+    .btn { background: #30244D; color: white; padding: 8px 12px; border-radius:6px; text-decoration:none }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h2></h2>
+      <hr>
+      <a href="{{ url_for('alumno.tablero_alumno') }}">Tablero Principal</a>
+      <a href="{{ url_for('alumno.mis_cursos') }}">Mis Cursos</a>
+      <a href="#" class="active">Buscar Profesores</a>
+      <a href="{{ url_for('alumno.perfil') }}">Mi Perfil</a>
+      <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main" style="padding:40px;">
+      <h1>Profesores</h1>
+      <p class="meta">Lista de docentes registrados en la plataforma.</p>
+
+      {% if docentes %}
+        <div class="list">
+          {% for d in docentes %}
+            <div class="card">
+              <h3>{{ d.perfil_usuario.nombre }} {{ d.perfil_usuario.apellido_paterno or '' }} {{ d.perfil_usuario.apellido_materno or '' }}</h3>
+              <p class="meta">Especialidad: {{ d.especialidad or 'No especificada' }} — Email: {{ d.perfil_usuario.email or '—' }}</p>
+              <div class="actions">
+                <!-- Enlace a más detalles del docente; si existe una vista pública futura, se puede enlazar aquí -->
+                <a class="btn" href="#">Ver perfil</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No se encontraron docentes.</p>
+      {% endif %}
+    </main>
+  </div>
+</body>
+</html>

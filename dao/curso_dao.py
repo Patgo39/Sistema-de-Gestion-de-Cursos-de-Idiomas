@@ -145,7 +145,7 @@ class CursoDao:
     @classmethod
     def obtener_cursos_por_docente(cls, id_usuario):
         '''
-        Obtener todos los cursos en la base de datos por id_usuario (alumno)
+        Obtener todos los cursos en la base de datos por id_usuario (docente)
         :param id_usuario:  id_usuario
         :return:  cursos en la base de datos
         '''
@@ -156,7 +156,7 @@ class CursoDao:
             cursos_inscritos = db.session.query(Curso).join(
                 Inscribir, Curso.id_curso == Inscribir.id_curso
             ).filter(
-                Inscribir.id_usuario == id_usuario
+                Inscribir.id_alumno == id_usuario
             ).all()
 
             return cursos_inscritos

@@ -11,9 +11,9 @@
     <aside class="sidebar">
         <h2></h2>
         <hr>
-        <a href="#">Mis Cursos</a>
-        <a href="#">Buscar Profesores</a>
-        <a href="#">Mi Perfil</a>
+        <a href="{{ url_for('alumno.mis_cursos') }}">Mis Cursos</a>
+        <a href="{{ url_for('alumno.listar_docentes') }}">Buscar Profesores</a>
+        <a href="{{ url_for('alumno.perfil') }}">Mi Perfil</a>
         <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}">Ver cursos disponibles</a>
         <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
     </aside>
