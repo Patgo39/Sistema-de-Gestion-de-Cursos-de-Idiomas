@@ -1,0 +1,141 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: sans-serif;
+    background: #f4f4f8;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.layout {
+    display: flex;
+    width: 700px;
+    height: 70vh;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+.sidebar {
+    width: 160px;
+    min-width: 160px;
+    background-color: #30244D;
+    padding: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+}
+.sidebar a:hover {
+    background: rgba(255,255,255,0.2);
+}
+.main {
+    flex: 1;
+    background: #ffffff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-y: auto;
+}
+.curso-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 12px;
+    width: 100%;
+}
+.curso-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+}
+.curso-header:hover {
+    background: #f8f6fb;
+}
+.curso-titulo {
+    font-weight: 600;
+    color: #30244D;
+    font-size: 15px;
+}
+.curso-nivel {
+    font-size: 12px;
+    color: #888;
+    background: #f0edf5;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+.curso-id {
+    font-size: 12px;
+    color: #aaa;
+}
+.curso-body {
+    display: none;
+    padding: 16px 20px;
+    border-top: 1px solid #f0edf5;
+}
+.curso-body.abierto {
+    display: block;
+}
+.curso-body p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+}
+.btn {
+    height: 40px;
+    padding: 0 20px;
+    background-color: #30244D;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+.btn:hover {
+    background-color: #3e3063;
+}
+.empty {
+    color: #aaa;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 40px;
+}
+.flash-container {
+    margin-bottom: 20px;
+    width: 100%;
+}
+.flash-message {
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    border: 1px solid transparent;
+}
+.flash-message.success {
+    background-color: #f0fff4;
+    color: #2f855a;
+    border: 1px solid #9ae6b4;
+}
+.flash-message.error {
+    background-color: #fff5f5;
+    color: #c53030;
+    border: 1px solid #feb2b2;
+}
