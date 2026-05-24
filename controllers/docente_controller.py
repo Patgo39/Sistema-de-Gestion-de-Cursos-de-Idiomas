@@ -3,6 +3,8 @@ import os
 import uuid
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for
 from supabase import create_client, Client
+
+from dao.docente_dao import DocenteDao
 from db import db
 from dao.curso_dao import CursoDao
 from dao.recurso_dao import RecursoDao
@@ -34,6 +36,9 @@ def tablero_docente():
     nombre = session.get('username')
     id_usuario = session.get('usuario')
     mis_cursos = CursoDao.obtener_cursos_por_docente(id_usuario)
+
+    DocenteDao.actualizar_ultimo_acceso(id_usuario)
+
     return render_template('docente/tablero_docente.html', nombre=nombre, cursos=mis_cursos)
 
 
@@ -69,7 +74,8 @@ def crear_curso_procesar():
             db.session.commit()
             id_idioma = nuevo_idioma.id_idioma
 
-        CursoDao.guardar_curso(nombre_curso, nivel, descripcion, id_idioma, id_docente)
+        CursoDao.crear_curso(nombre_curso, descripcion, nivel, id_docente, id_idioma)
+
         flash("Curso creado con éxito.", category="success")
         return redirect(url_for('docente.tablero_docente'))
 
