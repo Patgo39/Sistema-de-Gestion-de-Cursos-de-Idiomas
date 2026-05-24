@@ -1,0 +1,84 @@
+<style>
+    /* --- Estilos específicos para las tarjetas de curso --- */
+    .main-title { color: #30244D; margin: 0; font-size: 2rem; font-weight: 700; }
+    .main-subtitle { color: #666; margin: 5px 0 20px 0; font-size: 1.05rem; }
+
+    .courses-dashboard-container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box; }
+    .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; width: 100%; }
+    
+    .course-card { background: #f8f9fa; padding: 22px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; min-height: 200px; transition: transform 0.2s; }
+    .course-card:hover { transform: translateY(-2px); }
+    .card-docente { border-left: 5px solid #ff9800; }
+    .card-alumno { border-left: 5px solid #4CAF50; }
+
+    .course-card h3 { margin-top: 0; margin-bottom: 12px; color: #30244D; font-size: 1.25rem; font-weight: 700; }
+    .course-card p { margin: 6px 0; color: #555; font-size: 0.95rem; }
+    .course-card .meta-id { color: #777; font-size: 0.85rem; }
+
+    .card-actions { margin-top: 20px; display: flex; gap: 10px; }
+    
+    .btn-manage { flex: 1; padding: 10px; background: #f1f8e9; color: #4CAF50; text-decoration: none; border-radius: 6px; text-align: center; font-weight: bold; font-size: 0.9rem; transition: background 0.2s; }
+    .btn-manage:hover { background: #e1f5fe; }
+    
+    .btn-primary { flex: 1; padding: 10px; background: #30244D; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-size: 0.9rem; font-weight: bold; transition: background 0.2s; display: block; width: 100%; box-sizing: border-box; }
+    .btn-primary:hover { background: #42326b; }
+
+    .empty-state { text-align: center; padding: 40px 20px; border: 2px dashed #e0e0e0; border-radius: 12px; background: #fafafa; }
+    .empty-state p { color: #666; font-size: 1.05rem; margin: 0; }
+    .btn-explore { display: inline-block; margin-top: 15px; color: #4CAF50; font-weight: bold; text-decoration: none; background: #e8f5e9; padding: 10px 20px; border-radius: 6px; font-size: 0.95rem; transition: background 0.2s; }
+    .btn-explore:hover { background: #c8e6c9; }
+</style>
+
+<div>
+    <h2 class="main-title">
+        {% if role == 'docente' %}Mis Cursos Dictados{% else %}Mis Cursos Inscritos{% endif %}
+    </h2>
+    <p class="main-subtitle">
+        {% if role == 'docente' %}Aquí puedes gestionar tus materias y evaluar alumnos.{% else %}Accede directamente a tus aulas virtuales.{% endif %}
+    </p>
+</div>
+
+<div class="courses-dashboard-container">
+  {% if cursos %}
+    <div class="course-grid">
+        {% for curso in cursos %}
+          <div class="course-card {% if role == 'docente' %}card-docente{% else %}card-alumno{% endif %}">
+            <div>
+              <h3>{{ curso.nombre_curso }}</h3>
+              <p><strong>Nivel:</strong> {{ curso.nivel or 'Sin nivel' }}</p>
+              <p><strong>Idioma:</strong> 
+                {% if curso.idioma is mapping or curso.idioma.nombre_idioma is defined %}
+                  {{ curso.idioma.nombre_idioma }}
+                {% else %}
+                  {{ curso.idioma or 'Sin especificar' }}
+                {% endif %}
+              </p>
+              {% if role == 'docente' %}
+                <p class="meta-id"><strong>ID Curso:</strong> #{{ curso.id_curso }}</p>
+              {% else %}
+                <p><strong>Profesor:</strong> {{ curso.docente or 'Por asignar' }}</p>
+              {% endif %}
+            </div>
+
+            <div class="card-actions">
+              {% if role == 'docente' %}
+                <a href="{{ url_for('docente.acceder_curso_docente', id_curso=curso.id_curso) }}" class="btn-manage">Acceder al Curso</a>
+                <a href="{{ url_for('docente.curso_docente', id_curso=curso.id_curso) }}" class="btn-primary">Ver Alumnos</a>
+              {% else %}
+                <a href="{{ url_for('alumno.curso_detalle', id_curso=curso.id_curso) }}" class="btn-primary">Entrar al Aula</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>No tienes cursos registrados para mostrar en este momento.</p>
+      {% if role != 'docente' %}
+        <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}" class="btn-explore">
+            ¡Explora los cursos disponibles!
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>

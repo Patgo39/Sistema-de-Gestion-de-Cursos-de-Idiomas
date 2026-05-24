@@ -3,23 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestionar Curso - Linguamail</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/docente/gestionar_curso.css', v='1.3') }}" />
+  <title>Gestionar Curso</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}" />
+  <style>
+      /* --- Estilos Generales y Layout --- */
+      html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
+      .layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+      
+      /* --- Barra Lateral (Diseño de Sistema) --- */
+      .sidebar { width: 260px; min-width: 260px; background: #30244D; padding: 25px 20px; color: white; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; height: 100%; }
+      .sidebar h2 { margin: 0 0 10px 0; text-align: center; }
+      .sidebar hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; width: 100%; }
+      .sidebar a { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: bold; padding: 12px 15px; border-radius: 8px; transition: all 0.2s; font-size: 0.95rem; display: block; }
+      .sidebar a:hover { background: rgba(255,255,255,0.1); color: white; }
+      .sidebar a.active { background: rgba(255,255,255,0.2); color: white; box-shadow: inset 4px 0 0 #4CAF50; padding-left: 18px; }
+      .sidebar .logout-link { margin-top: auto; color: #ff6b6b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; border-radius: 0; }
+      .sidebar .logout-link:hover { background: transparent; color: #ff8787; text-decoration: underline; }
+
+      /* --- Contenido Principal --- */
+      .main-content { flex: 1; padding: 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; height: 100%; background: #f4f6f9; }
+      .main-title { color: #30244D; margin: 0; font-size: 2rem; font-weight: 700; }
+      .main-subtitle { color: #666; margin: 5px 0 0 0; font-size: 1.05rem; }
+
+      /* --- Contenedor Principal (Tarjetas Blancas) --- */
+      .content-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box; margin-bottom: 25px; }
+      .content-card h2 { margin-top: 0; color: #30244D; font-size: 1.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 20px; }
+
+      /* --- Formularios Modernos --- */
+      .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+      .form-group { display: flex; flex-direction: column; gap: 8px; }
+      .full-width { grid-column: span 2; }
+      
+      label { font-weight: bold; color: #444; font-size: 0.9rem; }
+      .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: inherit; font-size: 0.95rem; background: #f8f9fa; transition: border-color 0.2s; }
+      .form-control:focus { border-color: #30244D; outline: none; background: white; }
+      textarea.form-control { resize: vertical; }
+
+      /* --- Botones --- */
+      .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+      .actions-right { display: flex; gap: 12px; }
+      
+      .btn { padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer; text-decoration: none; border: none; transition: all 0.2s; text-align: center; }
+      .btn-primary { background: #4CAF50; color: white; }
+      .btn-primary:hover { background: #45a049; }
+      .btn-primary:disabled { background: #cccccc; color: #888888; cursor: not-allowed; }
+      
+      .btn-secondary { background: #f4f6f9; color: #555; border: 1px solid #ccc; }
+      .btn-secondary:hover { background: #e4e6e9; }
+      
+      .btn-danger { background: #ef4444; color: white; }
+      .btn-danger:hover { background: #dc2626; }
+
+      /* --- Tablas Modernas --- */
+      .table-container { width: 100%; overflow-x: auto; margin-bottom: 35px; }
+      .modern-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px; }
+      .modern-table th, .modern-table td { padding: 14px 16px; border-bottom: 1px solid #eaeaea; font-size: 0.95rem; }
+      .modern-table th { background-color: #f8f9fa; color: #30244D; font-weight: 700; }
+      .modern-table tr:hover { background-color: #fcfcfc; }
+      
+      .btn-table-action { color: #00BCD4; text-decoration: none; font-weight: bold; }
+      .btn-table-action:hover { text-decoration: underline; }
+      .btn-inline-delete { background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-family: inherit; font-size: 0.95rem; padding: 0; }
+      .btn-inline-delete:hover { text-decoration: underline; }
+      
+      .no-data { text-align: center; color: #888; font-style: italic; padding: 30px !important; }
+
+      /* --- Alertas de Sistema --- */
+      .custom-alert { padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 0.95rem; }
+      .alert-danger { background-color: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+      .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+
+      /* Subida de recursos interna */
+      .upload-box { background: #f8f9fa; border: 1px dashed #ccc; padding: 25px; border-radius: 10px; margin-top: 30px; }
+      .upload-box h3 { margin-top: 0; color: #30244D; font-size: 1.2rem; margin-bottom: 15px; }
+
+      @media (max-width: 768px) {
+          .form-grid { grid-template-columns: 1fr; }
+          .full-width { grid-column: span 1; }
+          .form-actions { flex-direction: column; gap: 15px; align-items: stretch; }
+          .actions-right { flex-direction: column; gap: 10px; }
+      }
+  </style>
 </head>
 <body>
   <div class="layout">
+
     <aside class="sidebar">
-        <h2>Linguamail</h2>
+        <h2>🧑‍💻 Sistema</h2>
         <hr>
-        <a href="{{ url_for('docente.tablero_docente') }}" class="active">Panel Principal</a>
-        <a href="{{ url_for('auth.cerrar_sesion') }}" class="btn-logout">Cerrar Sesión</a>
+        <a href="{{ url_for('docente.tablero_docente') }}" class="active">Tablero Personal</a>
+        <a href="{{ url_for('docente.crear_curso_vista') }}">➕ Crear Nuevo Curso</a>
+        <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
+        
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="logout-link">Cerrar Sesión</a>
     </aside>
 
-    <main class="main">
-      <section class="welcome-header">
-        <h1>Gestión del Curso</h1>
-        <p>Modifica la información general o da de baja este curso de la plataforma.</p>
-      </section>
+    <main class="main-content">
+      
+      <div>
+        <h1 class="main-title">Gestión del Curso</h1>
+        <p class="main-subtitle">Modifica la información general o da de baja este curso de la plataforma.</p>
+      </div>
 
       <div id="alertContainer">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -33,22 +117,24 @@
         {% endwith %}
       </div>
 
-      <div class="form-container">
+      <div class="content-card">
+        <h2>Información del Curso</h2>
+        
         <form id="cursoForm" action="{{ url_for('docente.actualizar_curso_procesar', id_curso=curso.id_curso) }}" method="POST">
           <div class="form-grid">
             <div class="form-group">
               <label for="nombre_curso">Nombre del Curso</label>
-              <input type="text" id="nombre_curso" name="nombre_curso" value="{{ curso.nombre_curso }}" required />
+              <input type="text" id="nombre_curso" name="nombre_curso" class="form-control" value="{{ curso.nombre_curso }}" required />
             </div>
 
             <div class="form-group">
               <label for="nivel">Nivel Técnico</label>
-              <input type="text" id="nivel" name="nivel" value="{{ curso.nivel }}" required />
+              <input type="text" id="nivel" name="nivel" class="form-control" value="{{ curso.nivel }}" required />
             </div>
 
             <div class="form-group full-width">
               <label for="nombre_idioma">Idioma del Curso</label>
-              <input type="text" id="nombre_idioma" name="nombre_idioma" value="{{ curso.idioma.nombre_idioma }}" list="lista-idiomas" autocomplete="off" required />
+              <input type="text" id="nombre_idioma" name="nombre_idioma" class="form-control" value="{{ curso.idioma.nombre_idioma }}" list="lista-idiomas" autocomplete="off" required />
 
               <datalist id="lista-idiomas">
                 {% for idioma in idiomas %}
@@ -59,27 +145,29 @@
 
             <div class="form-group full-width">
               <label for="descripcion">Descripción del Curso</label>
-              <textarea id="descripcion" name="descripcion" rows="4" required>{{ curso.descripcion }}</textarea>
+              <textarea id="descripcion" name="descripcion" class="form-control" rows="4" required>{{ curso.descripcion }}</textarea>
             </div>
           </div>
 
           <div class="form-actions">
-            <a href="{{ url_for('docente.tablero_docente') }}" class="btn-back">Volver</a>
+            <a href="{{ url_for('docente.tablero_docente') }}" class="btn btn-secondary">Volver</a>
 
             <div class="actions-right">
-              <button type="button" class="btn-delete" onclick="confirmarEliminacion()">Eliminar Curso</button>
-              <button type="submit" id="btnUpdate" class="btn-update" disabled>Actualizar Curso</button>
+              <button type="button" class="btn btn-danger" onclick="confirmarEliminacion()">Eliminar Curso</button>
+              <button type="submit" id="btnUpdate" class="btn btn-primary" disabled>Actualizar Curso</button>
             </div>
           </div>
         </form>
 
         <form id="deleteForm" action="{{ url_for('docente.eliminar_curso_procesar', id_curso=curso.id_curso) }}" method="POST" style="display: none;">
         </form>
+      </div>
 
-        <section class="recursos-section">
-          <h2>Materiales Didácticos del Curso</h2>
+      <div class="content-card">
+        <h2>Materiales Didácticos del Curso</h2>
 
-          <table class="table-recursos">
+        <div class="table-container">
+          <table class="modern-table">
             <thead>
               <tr>
                 <th>Título del Material</th>
@@ -96,10 +184,10 @@
                     <td>{{ recurso.descripcion or 'Sin descripción disponible' }}</td>
                     <td>{{ recurso.fecha_subida.strftime('%d/%m/%Y') }}</td>
                     <td>
-                      <a href="{{ recurso.archivo_url }}" target="_blank" class="btn-download">Ver Archivo</a>
+                      <a href="{{ recurso.archivo_url }}" target="_blank" class="btn-table-action">Ver Archivo</a>
                       &nbsp;|&nbsp;
                       <form action="{{ url_for('docente.eliminar_recurso_procesar', id_curso=curso.id_curso, id_recurso=recurso.id_recurso) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este material de forma permanente?');">
-                        <button type="submit" class="btn-delete-recurso">Eliminar</button>
+                        <button type="submit" class="btn-inline-delete">Eliminar</button>
                       </form>
                     </td>
                   </tr>
@@ -111,37 +199,37 @@
               {% endif %}
             </tbody>
           </table>
+        </div>
 
-          <div class="card-upload">
-            <h3>+ Cargar Nuevo Material al Curso</h3>
-            <form action="{{ url_for('docente.subir_recurso_procesar', id_curso=curso.id_curso) }}" method="POST" enctype="multipart/form-data">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="titulo_recurso">Título del Recurso *</label>
-                  <input type="text" id="titulo_recurso" name="titulo_recurso" placeholder="Ej. Lectura Pasado Simple" required />
-                </div>
-
-                <div class="form-group">
-                  <label for="archivo_fisico">Seleccionar Archivo (PDF, DOCX, PPTX) *</label>
-                  <input type="file" id="archivo_fisico" name="archivo_fisico" accept=".pdf,.doc,.docx,.ppt,.pptx" required />
-                </div>
-
-                <div class="form-group full-width">
-                  <label for="descripcion_recurso">Breve Descripción del Material</label>
-                  <textarea id="descripcion_recurso" name="descripcion_recurso" rows="2" placeholder="Escribe notas aclaratorias del archivo para tus alumnos..."></textarea>
-                </div>
+        <div class="upload-box">
+          <h3>➕ Cargar Nuevo Material al Curso</h3>
+          <form action="{{ url_for('docente.subir_recurso_procesar', id_curso=curso.id_curso) }}" method="POST" enctype="multipart/form-data">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="titulo_recurso">Título del Recurso *</label>
+                <input type="text" id="titulo_recurso" name="titulo_recurso" class="form-control" placeholder="Ej. Lectura Pasado Simple" required />
               </div>
 
-              <div style="margin-top: 15px; text-align: right;">
-                <button type="submit" class="btn-upload-submit">
-                  Subir Material
-                </button>
+              <div class="form-group">
+                <label for="archivo_fisico">Seleccionar Archivo (PDF, DOCX, PPTX) *</label>
+                <input type="file" id="archivo_fisico" name="archivo_fisico" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx" required />
               </div>
-            </form>
-          </div>
-        </section>
 
+              <div class="form-group full-width">
+                <label for="descripcion_recurso">Breve Descripción del Material</label>
+                <textarea id="descripcion_recurso" name="descripcion_recurso" class="form-control" rows="2" placeholder="Escribe notas aclaratorias del archivo para tus alumnos..."></textarea>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+              <button type="submit" class="btn btn-primary">
+                Subir Material
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
+
     </main>
   </div>
 
@@ -149,10 +237,12 @@
     const form = document.getElementById('cursoForm');
     const btnUpdate = document.getElementById('btnUpdate');
 
+    // Escucha cambios en el formulario para activar el botón de actualizar
     form.addEventListener('input', () => {
         btnUpdate.disabled = false;
     });
 
+    // Confirmación nativa antes del envío del formulario de eliminación
     function confirmarEliminacion() {
         if (confirm("¿Estás completamente seguro de que deseas eliminar este curso? Esta acción es irreversible.")) {
             document.getElementById('deleteForm').submit();

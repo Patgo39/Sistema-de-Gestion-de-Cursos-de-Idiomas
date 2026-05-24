@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ curso.nombre_curso if curso else 'Curso' }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}" />
+  <style>
+      /* --- Estilos Generales y Layout --- */
+      html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
+      .layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+      
+      /* --- Barra Lateral (Diseño de Sistema) --- */
+      .sidebar { width: 260px; min-width: 260px; background: #30244D; padding: 25px 20px; color: white; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; height: 100%; }
+      .sidebar h2 { margin: 0 0 10px 0; text-align: center; }
+      .sidebar hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; width: 100%; }
+      .sidebar a { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: bold; padding: 12px 15px; border-radius: 8px; transition: all 0.2s; font-size: 0.95rem; display: block; }
+      .sidebar a:hover { background: rgba(255,255,255,0.1); color: white; }
+      .sidebar a.active { background: rgba(255,255,255,0.2); color: white; box-shadow: inset 4px 0 0 #4CAF50; padding-left: 18px; }
+      .sidebar .logout-link { margin-top: auto; color: #ff6b6b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; border-radius: 0; }
+      .sidebar .logout-link:hover { background: transparent; color: #ff8787; text-decoration: underline; }
+
+      /* --- Contenido Principal --- */
+      .main-content { flex: 1; padding: 40px; box-sizing: border-box; display: flex; flex-direction: column; overflow-y: auto; height: 100%; background: #f4f6f9; }
+      
+      /* --- Encabezado del Curso --- */
+      .course-header { background: #30244D; color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; }
+      .course-header h2 { margin: 0 0 10px 0; font-size: 2rem; }
+      .course-header p { margin: 0; color: rgba(255,255,255,0.8); font-size: 1.05rem; line-height: 1.5; }
+
+      /* --- Layout de Columnas --- */
+      .content-grid { display: grid; grid-template-columns: 1fr 350px; gap: 25px; align-items: start; }
+      
+      /* --- Tarjetas de Contenido --- */
+      .info-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+      .info-card h3 { margin-top: 0; color: #30244D; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 20px; }
+      .info-card h4 { color: #444; margin-top: 25px; margin-bottom: 15px; }
+
+      /* --- Listas --- */
+      .material-list { list-style: none; padding: 0; margin: 0; }
+      .material-list li { padding: 15px; background: #f8f9fa; border: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 5px; transition: transform 0.2s; }
+      .material-list li:hover { transform: translateX(5px); border-color: #d1d5db; }
+      .material-link { color: #00BCD4; font-weight: bold; text-decoration: none; font-size: 1.1rem; }
+      .material-link:hover { text-decoration: underline; color: #0097a7; }
+      .material-desc { color: #666; font-size: 0.9rem; margin: 0; }
+
+      .student-list { padding-left: 20px; color: #555; }
+      .student-list li { margin-bottom: 10px; }
+      .student-link { color: #30244D; text-decoration: none; font-weight: bold; }
+      .student-link:hover { text-decoration: underline; color: #4CAF50; }
+
+      /* --- Formulario --- */
+      .upload-form { background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px dashed #ccc; margin-top: 20px; }
+      .form-control { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: inherit; font-size: 0.95rem; }
+      textarea.form-control { resize: vertical; min-height: 80px; }
+      input[type="file"].form-control { padding: 10px; background: white; }
+      
+      .btn-primary { background: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.2s; }
+      .btn-primary:hover { background: #45a049; }
+
+      .empty-message { color: #888; font-style: italic; }
+
+      /* Responsividad */
+      @media (max-width: 900px) {
+          .content-grid { grid-template-columns: 1fr; }
+      }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    
+    <aside class="sidebar">
+      <h2>🧑‍💻 Sistema</h2>
+      <hr>
+      {% if role == 'docente' %}
+        <a href="{{ url_for('docente.tablero_docente') }}">Tablero Principal</a>
+        <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
+      {% else %}
+        <a href="{{ url_for('alumno.tablero_alumno') }}">Tablero Principal</a>
+        <a href="{{ url_for('alumno.mis_cursos') }}" class="active">Mis Cursos</a>
+        <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}">Ver cursos disponibles</a>
+        <a href="{{ url_for('alumno.perfil') }}">Mi Perfil</a>
+      {% endif %}
+      <a href="{{ url_for('auth.cerrar_sesion') }}" class="logout-link">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main-content">
+      
+      <div class="course-header">
+        <h2>{{ curso.nombre_curso }} <span style="opacity: 0.7; font-size: 1.2rem;">#{{ curso.id_curso }}</span></h2>
+        <p>{{ curso.descripcion }}</p>
+      </div>
+
+      <section class="content-grid">
+        
+        <div class="info-card">
+          <h3>Materiales del Curso</h3>
+          
+          {% if recursos %}
+            <ul class="material-list">
+              {% for r in recursos %}
+                <li>
+                  <a href="{{ r.archivo_url }}" target="_blank" class="material-link">📄 {{ r.titulo_recurso }}</a>
+                  {% if r.descripcion %}
+                    <p class="material-desc">{{ r.descripcion }}</p>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="empty-message">No hay materiales publicados para este curso todavía.</p>
+          {% endif %}
+
+          {% if role == 'docente' %}
+            <div class="upload-form">
+              <h4>Subir nuevo material</h4>
+              <form action="{{ url_for('docente.subir_recurso_procesar', id_curso=curso.id_curso) }}" method="POST" enctype="multipart/form-data">
+                <input type="text" name="titulo_recurso" class="form-control" placeholder="Título del archivo" required />
+                <textarea name="descripcion_recurso" class="form-control" placeholder="Breve descripción (opcional)"></textarea>
+                <input type="file" name="archivo_fisico" class="form-control" required />
+                <button type="submit" class="btn-primary">Subir Archivo</button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="info-card">
+          <h3>Detalles</h3>
+          <p><strong>Nivel:</strong> {{ curso.nivel }}</p>
+          <p><strong>Idioma:</strong> {{ curso.idioma.nombre_idioma if curso.idioma else 'No especificado' }}</p>
+
+          {% if role == 'docente' and lista_inscripcion %}
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <h4>Alumnos inscritos</h4>
+            <ol class="student-list">
+              {% for a in lista_inscripcion %}
+                <li>
+                  <a href="{{ url_for('docente.datos_alumno', id_curso=curso.id_curso, id_usuario=a.id_usuario) }}" class="student-link">
+                    {{ a.nombre_completo }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ol>
+          {% endif %}
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>
