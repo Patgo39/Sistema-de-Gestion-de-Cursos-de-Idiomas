@@ -74,7 +74,6 @@
       <hr>
       {% if role == 'docente' %}
         <a href="{{ url_for('docente.tablero_docente') }}">Tablero Principal</a>
-        <a href="{{ url_for('docente.mis_cursos_docente') }}" class="active">Mis Cursos</a>
         <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
       {% else %}
         <a href="{{ url_for('alumno.tablero_alumno') }}">Tablero Principal</a>

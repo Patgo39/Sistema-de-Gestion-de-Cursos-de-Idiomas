@@ -3,39 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crear Nuevo Curso - Linguamail</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/docente/crear_curso.css', v='1.2') }}" />
+  <title>Crear Nuevo Curso - Docente</title>
+  <style>
+      /* --- Estilos Generales y Layout --- */
+      html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
+      .layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+      
+      /* --- Barra Lateral --- */
+      .sidebar { width: 260px; min-width: 260px; background: #30244D; padding: 25px 20px; color: white; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; height: 100%; }
+      .sidebar h2 { margin: 0 0 10px 0; text-align: center; }
+      .sidebar hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; width: 100%; }
+      .sidebar a { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: bold; padding: 12px 15px; border-radius: 8px; transition: all 0.2s; font-size: 0.95rem; display: block; }
+      .sidebar a:hover { background: rgba(255,255,255,0.1); color: white; }
+      .sidebar a.active { background: rgba(255,255,255,0.2); color: white; box-shadow: inset 4px 0 0 #4CAF50; padding-left: 18px; }
+      
+      /* Botón especial activo para esta vista */
+      .sidebar a.btn-create { background: #4CAF50; color: white; text-align: center; margin: 10px 0; box-shadow: inset 4px 0 0 #fff; }
+
+      .sidebar .logout-link { margin-top: auto; color: #ff6b6b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; border-radius: 0; }
+      .sidebar .logout-link:hover { background: transparent; color: #ff8787; text-decoration: underline; }
+
+      /* --- Contenido Principal --- */
+      .main-content { flex: 1; padding: 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; height: 100%; background: #f4f6f9; align-items: center; }
+      
+      /* --- Tarjeta del Formulario --- */
+      .form-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 800px; box-sizing: border-box; margin-top: 20px; }
+      .form-card h1 { margin-top: 0; color: #30244D; font-size: 2rem; font-weight: 700; }
+      .form-card p { color: #555; font-size: 1.05rem; margin-top: 5px; margin-bottom: 30px; }
+
+      /* --- Estilos del Formulario --- */
+      .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+      .form-group { display: flex; flex-direction: column; gap: 8px; }
+      .form-group.full-width { grid-column: 1 / -1; }
+      
+      .form-group label { font-weight: 600; color: #30244D; font-size: 0.95rem; }
+      .form-group input, .form-group textarea { padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-family: sans-serif; font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; background-color: #f8f9fa; }
+      .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #30244D; box-shadow: 0 0 0 3px rgba(48, 36, 77, 0.1); background-color: #fff; }
+      
+      .form-actions { display: flex; gap: 15px; margin-top: 35px; justify-content: flex-end; border-top: 1px solid #eee; padding-top: 20px; }
+      
+      .btn-cancel { padding: 12px 24px; background: #f1f3f5; color: #555; text-decoration: none; border-radius: 8px; font-weight: bold; transition: background 0.2s; text-align: center; }
+      .btn-cancel:hover { background: #e2e6ea; color: #333; }
+      
+      .btn-submit { padding: 12px 24px; background: #30244D; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+      .btn-submit:hover { background: #42326b; }
+  </style>
 </head>
 <body>
   <div class="layout">
+
     <aside class="sidebar">
-        <h2>Linguamail</h2>
+        <h2>🧑‍💻 Sistema</h2>
         <hr>
-        <a href="{{ url_for('docente.tablero_docente') }}" class="active">Panel Principal</a>
-        <a href="{{ url_for('auth.cerrar_sesion') }}" class="btn-logout">Cerrar Sesión</a>
+        <a href="{{ url_for('docente.tablero_docente') }}">Tablero Personal</a>
+        <a href="{{ url_for('docente.crear_curso_vista') }}" class="btn-create">➕ Crear Nuevo Curso</a>
+        <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
+        
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="logout-link">Cerrar Sesión</a>
     </aside>
 
-    <main class="main">
-      <section class="welcome-header">
+    <main class="main-content">
+
+      <div class="form-card">
         <h1>Crear Nuevo Curso</h1>
         <p>Completa la información requerida para registrar un nuevo grupo en el sistema.</p>
-      </section>
 
-      <div id="alertContainer">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="custom-alert {% if category == 'error' %}alert-danger{% else %}alert-success{% endif %}">
-                <span>{{ message }}</span>
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-      </div>
-
-      <div class="form-container">
         <form action="{{ url_for('docente.crear_curso_procesar') }}" method="POST">
           <div class="form-grid">
+            
             <div class="form-group">
               <label for="nombre_curso">Nombre del Curso</label>
               <input type="text" id="nombre_curso" name="nombre_curso" value="{{ nombre_curso or '' }}" placeholder="Ej. Inglés Básico" required />
@@ -69,7 +104,37 @@
           </div>
         </form>
       </div>
+
     </main>
   </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <script>
+          (function() {
+            const toast = document.createElement('div');
+            toast.innerText = "{{ message }}";
+            Object.assign(toast.style, {
+              position: 'fixed', top: '25px', right: '25px',
+              backgroundColor: "{{ '#ef4444' if category == 'error' else '#10b981' }}",
+              color: 'white', padding: '12px 24px', borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontWeight: '600',
+              fontFamily: 'sans-serif', zIndex: '99999',
+              transition: 'opacity 0.4s ease, transform 0.4s ease',
+              opacity: '0', transform: 'translateY(-10px)'
+            });
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateY(0)'; }, 50);
+            setTimeout(() => {
+              toast.style.opacity = '0'; toast.style.transform = 'translateY(-10px)';
+              setTimeout(() => toast.remove(), 400);
+            }, 4000);
+          })();
+        </script>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
 </body>
 </html>

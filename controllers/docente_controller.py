@@ -42,7 +42,8 @@ def tablero_docente():
         flash("Acceso denegado. Debes iniciar sesión como docente.")
         return redirect(url_for('auth.iniciar_sesion'))
 
-    nombre = session.get('username')
+    usuario = UsuarioDao.buscar_por_username(session.get('username'))
+    nombre = usuario.nombre if usuario else 'Docente'
     id_usuario = session.get('usuario')
     mis_cursos = CursoDao.obtener_cursos_por_docente(id_usuario)
     DocenteDao.actualizar_ultimo_acceso(id_usuario)
@@ -55,7 +56,8 @@ def mis_cursos_docente():
         flash("Acceso denegado. Debes iniciar sesión como docente.")
         return redirect(url_for('auth.iniciar_sesion'))
 
-    id_usuario = session.get('usuario')
+    usuario = UsuarioDao.buscar_por_username(session.get('username'))
+    id_usuario = usuario.id_usuario if usuario else None
     cursos = CursoDao.obtener_cursos_por_docente(id_usuario) if id_usuario else []
     return render_template('curso_lista.html', cursos=cursos, role='docente')
 
