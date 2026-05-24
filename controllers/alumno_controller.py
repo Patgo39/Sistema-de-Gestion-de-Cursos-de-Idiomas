@@ -114,6 +114,20 @@ def listar_docentes():
     docentes = DocenteDao.buscar_docentes()
     return render_template('alumno/listar_docentes.html', docentes=docentes)
 
+
+@alumno_bp.route('/docente/<int:id_docente>/perfil', methods=['GET'])
+def perfil_docente_publico(id_docente):
+    if 'username' not in session or session.get('rol', '').lower() != 'alumno':
+        flash('Por favor, inicia sesión como alumno.')
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    docente = DocenteDao.buscar_por_id(id_docente)
+    if not docente:
+        flash('No se encontró el perfil del docente.')
+        return redirect(url_for('alumno.listar_docentes'))
+
+    return render_template('alumno/perfil_docente.html', docente=docente, role='alumno')
+
 #realiza la inscripcion tras verificar requerimientos
 @alumno_bp.route('/tablero_alumno/cursos_disponibles/<int:id_curso>/inscripcion', methods=['POST'])
 def inscripcion_curso_disponibles(id_curso):
