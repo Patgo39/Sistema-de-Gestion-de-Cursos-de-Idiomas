@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for
+
+from dao.alumno_dao import AlumnoDao
 from dao.curso_dao import CursoDao
 from dao.inscribir_dao import InscribirDao
 from dao.usuario_dao import UsuarioDao
@@ -24,6 +26,9 @@ def tablero_alumno():
     nombre = session.get('username')
     id_usuario = session.get('usuario')
     cursos_inscritos = CursoDao.obtener_cursos_por_alumno(id_usuario)
+
+    AlumnoDao.actualizar_ultimo_acceso(id_usuario)
+
     return render_template('alumno/tablero_alumno.html', nombre=nombre, cursos=cursos_inscritos)
 
 

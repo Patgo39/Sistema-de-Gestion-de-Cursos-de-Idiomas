@@ -1,6 +1,8 @@
 from db import db
 from models.usuario import Usuario
 from models.administrador import Administrador
+from datetime import datetime
+from datetime import date
 
 class AdministradorDao:
 
@@ -93,3 +95,18 @@ class AdministradorDao:
             db.session.rollback()
             print(f"Error al eliminar administrador: {e}")
             return False
+
+    @staticmethod
+    def actualizar_ultimo_acceso(id_usuario) -> None:
+        admin = AdministradorDao.obtener_por_id(id_usuario)
+        if not admin:
+            raise Exception(f"No se encontró el administrador con id : {id_usuario}")
+
+        usuario = admin.perfil_usuario
+
+        usuario.ultima_fecha_acceso = date.today()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
