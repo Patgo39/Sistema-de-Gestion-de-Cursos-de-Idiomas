@@ -3,6 +3,7 @@ from getopt import error
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for, jsonify
 from dao.alumno_dao import AlumnoDao
 from dao.docente_dao import DocenteDao
+from dao.administrador_dao import AdministradorDao
 from dao.curso_dao import CursoDao
 from models import Alumno
 from models import Administrador
@@ -18,6 +19,10 @@ def tablero_administrador():
     if not nombre:
         flash("Por favor, inicia sesión primero", category="error")
         return redirect(url_for('auth.iniciar_sesion'))
+
+    id_usuario = session.get('usuario')
+
+    AdministradorDao.actualizar_ultimo_acceso(id_usuario)
 
     docentes = DocenteDao.buscar_docentes()
     alumnos = AlumnoDao.buscar_alumnos()
@@ -88,7 +93,7 @@ def editar_configuracion():
             return redirect(url_for('admin.editar_configuracion'))
 
         try:
-            #AdminDao.actualizar_administrador(id_usuario, admin_dict)
+            AdministradorDao.actualizar_administrador(id_usuario, admin_dict)
             flash("Datos actualizados correctamente", category="success")
             return redirect(url_for('admin.editar_configuracion'))
         except Exception as e:
