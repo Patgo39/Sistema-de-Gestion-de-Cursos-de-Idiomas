@@ -5,6 +5,8 @@ from typing import Optional
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for
 from supabase import create_client, Client
+
+from dao.docente_dao import DocenteDao
 from db import db
 from dao.curso_dao import CursoDao
 from dao.recurso_dao import RecursoDao
