@@ -21,7 +21,8 @@ def tablero_alumno():
         flash("Acceso denegado. Debes iniciar sesión como alumno.")
         return redirect(url_for('auth.iniciar_sesion'))
 
-    nombre = session.get('username')
+    usuario = UsuarioDao.buscar_por_username(session.get('username'))
+    nombre = usuario.nombre if usuario else 'Alumno'
     id_usuario = session.get('usuario')
     cursos_inscritos = CursoDao.obtener_cursos_por_alumno(id_usuario)
     return render_template('alumno/tablero_alumno.html', nombre=nombre, cursos=cursos_inscritos)
@@ -35,7 +36,8 @@ def mis_cursos():
 
     usuario = UsuarioDao.buscar_por_username(session.get('username'))
     cursos = CursoDao.obtener_cursos_por_alumno(usuario.id_usuario) if usuario else []
-    return render_template('curso_lista.html', cursos=cursos, role='alumno')
+    nombre_alumno = usuario.nombre if usuario else 'Alumno'
+    return render_template('alumno/mis_cursos_alumno.html', cursos=cursos, role='alumno', nombre=nombre_alumno)
 
 
 @alumno_bp.route('/curso/<int:id_curso>', methods=['GET'])
