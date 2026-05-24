@@ -1,6 +1,8 @@
 
 import os
 import uuid
+from typing import Optional
+from flask import Blueprint, render_template, request, redirect, flash, session, url_for
 from flask import Blueprint, render_template, request, redirect, flash, session, url_for
 from supabase import create_client, Client
 
@@ -9,6 +11,7 @@ from db import db
 from dao.curso_dao import CursoDao
 from dao.recurso_dao import RecursoDao
 from dao.inscribir_dao import InscribirDao
+from dao.usuario_dao import UsuarioDao
 from models.curso import Curso
 from models.idioma import Idioma
 
@@ -19,8 +22,14 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 BUCKET_NAME = os.environ.get("SUPABASE_BUCKET", "materiales-cursos")
 
-# Inicialización segura del cliente de almacenamiento
-supabase_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# Inicialización opcional del cliente de almacenamiento.
+# Evita levantar excepciones si las variables no están definidas (útil en tests/local).
+supabase_client: Optional[Client] = None
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception:
+        supabase_client = None
 
 
 @docente_bp.route('/tablero_docente')
@@ -36,10 +45,45 @@ def tablero_docente():
     nombre = session.get('username')
     id_usuario = session.get('usuario')
     mis_cursos = CursoDao.obtener_cursos_por_docente(id_usuario)
+    return render_template('docente/tablero_docente.html', nombre=nombre, cursos=mis_cursos, role='docente')
 
-    DocenteDao.actualizar_ultimo_acceso(id_usuario)
 
-    return render_template('docente/tablero_docente.html', nombre=nombre, cursos=mis_cursos)
+@docente_bp.route('/mis_cursos', methods=['GET'])
+def mis_cursos_docente():
+    if 'username' not in session or session.get('rol', '').lower() != 'docente':
+        flash("Acceso denegado. Debes iniciar sesión como docente.")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    id_usuario = session.get('usuario')
+    cursos = CursoDao.obtener_cursos_por_docente(id_usuario) if id_usuario else []
+    return render_template('curso_lista.html', cursos=cursos, role='docente')
+
+
+@docente_bp.route('/perfil', methods=['GET', 'POST'])
+def perfil_docente():
+    if 'username' not in session:
+        flash('Por favor, inicia sesión.')
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    usuario = UsuarioDao.buscar_por_username(session.get('username'))
+    if request.method == 'POST':
+        datos = {
+            'nombre': request.form.get('nombre'),
+            'apellido_paterno': request.form.get('apellido_paterno'),
+            'apellido_materno': request.form.get('apellido_materno'),
+            'email': request.form.get('email'),
+            'fecha_nacimiento': request.form.get('fecha_nacimiento') or None,
+            'genero': request.form.get('genero'),
+            'pais': request.form.get('pais')
+        }
+        success = UsuarioDao.actualizar_perfil_basico(usuario.id_usuario, datos)
+        if success:
+            flash('Perfil actualizado correctamente', 'success')
+        else:
+            flash('Error al actualizar el perfil', 'error')
+        return redirect(url_for('docente.perfil_docente'))
+
+    return render_template('perfil.html', usuario=usuario, role='docente')
 
 
 @docente_bp.route('/crear_curso', methods=['GET'])
@@ -104,6 +148,15 @@ def gestionar_curso_vista(id_curso):
                            idiomas=todos_los_idiomas,
                            recursos=materiales_del_curso)
 
+
+@docente_bp.route('/curso/<int:id_curso>', methods=['GET'])
+def acceder_curso_docente(id_curso):
+    if 'username' not in session or session.get('rol', '').lower() != 'docente':
+        flash("Acceso denegado. Debes iniciar sesión como docente.")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    return redirect(url_for('docente.gestionar_curso_vista', id_curso=id_curso))
+
 #Obtiene informacion sobre un curso: nombre, id del curso, lista de alumnos
 @docente_bp.route('/tablero_docente/curso_docente/<int:id_curso>', methods=['GET'])
 def curso_docente(id_curso):
@@ -111,16 +164,16 @@ def curso_docente(id_curso):
     if not session.get('username'):
         flash("Por favor, inicia sesión primero")
         return redirect(url_for('auth.iniciar_sesion'))
-
-    #informacion general y lista de alumnos inscritos al curso
+    # informacion general, lista de alumnos y materiales del curso
     lista_inscripcion = InscribirDao.consultar_lista_inscripcion(id_curso)
     curso = CursoDao.buscar_por_id(id_curso)
+    recursos = RecursoDao.obtener_por_curso(id_curso)
 
     if not curso:
         flash("Curso no encontrado")
         return redirect(url_for('docente.tablero_docente'))
 
-    return render_template('docente/curso_informacion.html', lista_inscripcion = lista_inscripcion, curso = curso)
+    return render_template('curso_detalle.html', curso=curso, recursos=recursos, lista_inscripcion=lista_inscripcion, role='docente')
 
 #Obtiene los datos de un alumno inscrito al curso
 @docente_bp.route('/tablero_docente/curso_docente/<int:id_curso>/alumno/<int:id_usuario>', methods=['GET'])
@@ -229,6 +282,11 @@ def subir_recurso_procesar(id_curso):
         extension = file.filename.split('.')[-1] if '.' in file.filename else 'dat'
         nombre_unico_archivo = f"{uuid.uuid4()}.{extension}"
 
+        # Verificar que el cliente de Supabase esté disponible
+        if not supabase_client:
+            flash("El almacenamiento en la nube no está configurado.", category="error")
+            return redirect(url_for('docente.gestionar_curso_vista', id_curso=id_curso))
+
         # Transmitir el archivo hacia Supabase
         file_bytes = file.read()
         supabase_client.storage.from_(BUCKET_NAME).upload(
@@ -264,6 +322,11 @@ def eliminar_recurso_procesar(id_curso, id_recurso):
     try:
         # Recuperar el nombre exacto del objeto en la nube
         nombre_archivo_en_nube = recurso.archivo_url.split('/')[-1]
+
+        # Verificar que el cliente de Supabase esté disponible
+        if not supabase_client:
+            flash("El almacenamiento en la nube no está configurado.", category="error")
+            return redirect(url_for('docente.gestionar_curso_vista', id_curso=id_curso))
 
         # Purgar el archivo binario del Storage de Supabase
         supabase_client.storage.from_(BUCKET_NAME).remove([nombre_archivo_en_nube])

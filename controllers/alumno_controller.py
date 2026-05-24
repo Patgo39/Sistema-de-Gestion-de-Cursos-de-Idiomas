@@ -4,9 +4,12 @@ from dao.alumno_dao import AlumnoDao
 from dao.curso_dao import CursoDao
 from dao.inscribir_dao import InscribirDao
 from dao.usuario_dao import UsuarioDao
+from dao.recurso_dao import RecursoDao
 from models.dominar import Dominar
+from dao.docente_dao import DocenteDao
 
 from dao.curso_dao import CursoDao
+from flask import request
 
 alumno_bp = Blueprint('alumno', __name__)
 
@@ -29,6 +32,63 @@ def tablero_alumno():
     return render_template('alumno/tablero_alumno.html', nombre=nombre, cursos=cursos_inscritos)
 
 
+@alumno_bp.route('/mis_cursos', methods=['GET'])
+def mis_cursos():
+    if 'username' not in session or session.get('rol', '').lower() != 'alumno':
+        flash("Por favor, inicia sesión como alumno.")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    usuario = UsuarioDao.buscar_por_username(session.get('username'))
+    cursos = CursoDao.obtener_cursos_por_alumno(usuario.id_usuario) if usuario else []
+    return render_template('curso_lista.html', cursos=cursos, role='alumno')
+
+
+@alumno_bp.route('/curso/<int:id_curso>', methods=['GET'])
+def curso_detalle(id_curso):
+    rol = session.get('rol', '').lower()
+    if 'username' not in session:
+        flash("Por favor, inicia sesión primero")
+        return redirect(url_for('auth.iniciar_sesion'))
+    if rol != 'alumno':
+        flash("Acceso denegado. Esta sección es solo para alumnos.")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    curso = CursoDao.buscar_por_id(id_curso)
+    recursos = RecursoDao.obtener_por_curso(id_curso)
+    if not curso:
+        flash("Curso no encontrado")
+        return redirect(url_for('alumno.mis_cursos'))
+
+    return render_template('curso_detalle.html', curso=curso, recursos=recursos, role='alumno')
+
+
+@alumno_bp.route('/perfil', methods=['GET', 'POST'])
+def perfil():
+    if 'username' not in session:
+        flash("Por favor, inicia sesión.")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    usuario = UsuarioDao.buscar_por_username(session.get('username'))
+    if request.method == 'POST':
+        datos = {
+            'nombre': request.form.get('nombre'),
+            'apellido_paterno': request.form.get('apellido_paterno'),
+            'apellido_materno': request.form.get('apellido_materno'),
+            'email': request.form.get('email'),
+            'fecha_nacimiento': request.form.get('fecha_nacimiento') or None,
+            'genero': request.form.get('genero'),
+            'pais': request.form.get('pais')
+        }
+        success = UsuarioDao.actualizar_perfil_basico(usuario.id_usuario, datos)
+        if success:
+            flash('Perfil actualizado correctamente', 'success')
+        else:
+            flash('Error al actualizar el perfil', 'error')
+        return redirect(url_for('alumno.perfil'))
+
+    return render_template('perfil.html', usuario=usuario, role='alumno')
+
+
 #obtiene todos los cursos menos los que ya esta inscrito
 @alumno_bp.route('/tablero_alumno/cursos_disponibles', methods=['GET'])
 def tablero_cursos_disponibles_alumno():
@@ -48,6 +108,30 @@ def tablero_cursos_disponibles_alumno():
     cursos_disponibles = [c for c in todos_los_cursos if c['id_curso'] not in ids_inscritos]
 
     return render_template('alumno/cursos_disponibles.html', cursos_disponibles=cursos_disponibles)
+
+
+@alumno_bp.route('/buscar_docentes', methods=['GET'])
+def listar_docentes():
+    if 'username' not in session or session.get('rol', '').lower() != 'alumno':
+        flash('Por favor, inicia sesión como alumno.')
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    docentes = DocenteDao.buscar_docentes()
+    return render_template('alumno/listar_docentes.html', docentes=docentes)
+
+
+@alumno_bp.route('/docente/<int:id_docente>/perfil', methods=['GET'])
+def perfil_docente_publico(id_docente):
+    if 'username' not in session or session.get('rol', '').lower() != 'alumno':
+        flash('Por favor, inicia sesión como alumno.')
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    docente = DocenteDao.buscar_por_id(id_docente)
+    if not docente:
+        flash('No se encontró el perfil del docente.')
+        return redirect(url_for('alumno.listar_docentes'))
+
+    return render_template('alumno/perfil_docente.html', docente=docente, role='alumno')
 
 #realiza la inscripcion tras verificar requerimientos
 @alumno_bp.route('/tablero_alumno/cursos_disponibles/<int:id_curso>/inscripcion', methods=['POST'])
@@ -92,3 +176,13 @@ def inscripcion_curso_disponibles(id_curso):
     InscribirDao.crear_inscripcion(usuario.id_usuario, id_curso)
     flash("Inscripción exitosa")
     return redirect(url_for('alumno.tablero_cursos_disponibles_alumno'))
+
+@alumno_bp.route('/mis_cursos', methods=['GET'])
+def mis_cursos_alumno():
+    if 'username' not in session or session.get('rol', '').lower() != 'alumno':
+        flash("Por favor, inicia sesión como alumno.")
+        return redirect(url_for('auth.iniciar_sesion'))
+
+    usuario = UsuarioDao.buscar_por_username(session['username'])
+    cursos = CursoDao.obtener_cursos_por_alumno(usuario.id_usuario) if usuario else []
+    return render_template('curso_lista.html', cursos=cursos, role='alumno')

@@ -6,44 +6,75 @@
   <title>Panel de Alumno</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}" />
   <style>
-      .sidebar { padding: 20px; color: white; display: flex; flex-direction: column; gap: 20px; }
-      .sidebar a { color: white; text-decoration: none; font-weight: bold; padding: 10px; border-radius: 5px; }
-      .sidebar a:hover { background: rgba(255,255,255,0.2); }
-      .welcome-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+      /* --- Estilos Generales y Layout --- */
+      html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
+      .layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+      
+      /* --- Barra Lateral (Diseño de Sistema) --- */
+      .sidebar { width: 260px; min-width: 260px; background: #30244D; padding: 25px 20px; color: white; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; height: 100%; }
+      .sidebar h2 { margin: 0 0 10px 0; text-align: center; }
+      .sidebar hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; width: 100%; }
+      .sidebar a { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: bold; padding: 12px 15px; border-radius: 8px; transition: all 0.2s; font-size: 0.95rem; display: block; }
+      .sidebar a:hover { background: rgba(255,255,255,0.1); color: white; }
+      .sidebar a.active { background: rgba(255,255,255,0.2); color: white; box-shadow: inset 4px 0 0 #4CAF50; padding-left: 18px; }
+      .sidebar .logout-link { margin-top: auto; color: #ff6b6b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; border-radius: 0; }
+      .sidebar .logout-link:hover { background: transparent; color: #ff8787; text-decoration: underline; }
+
+      /* --- Contenido Principal --- */
+      .main-content { flex: 1; padding: 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; height: 100%; background: #f4f6f9; }
+      
+      /* --- Tarjeta de Bienvenida y Métricas --- */
+      .welcome-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box; }
+      .welcome-card h1 { margin-top: 0; color: #30244D; font-size: 2rem; font-weight: 700; }
+      .welcome-card p { color: #555; font-size: 1.05rem; margin-top: 5px; }
+
+      .metrics-grid { margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+      .metric-box { padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+      .metric-box h3 { margin: 0; font-size: 2.2rem; color: #30244D; }
+      .metric-box p { margin: 5px 0 0 0; font-weight: bold; color: #666; font-size: 0.95rem; }
+      
+      .metric-blue { background: #e3f2fd; }
+      .metric-green { background: #f1f8e9; }
+      .metric-orange { background: #fff3e0; }
   </style>
 </head>
 <body>
   <div class="layout">
+
     <aside class="sidebar">
-        <h2></h2>
+        <h2>🧑‍💻 Sistema</h2>
         <hr>
-        <a href="#">Mis Cursos</a>
-        <a href="#">Buscar Profesores</a>
-        <a href="#">Mi Perfil</a>
+        <a href="{{ url_for('alumno.tablero_alumno') }}" class="active">Tablero Principal</a>
+        <a href="{{ url_for('alumno.mis_cursos') }}">Mis Cursos</a>
+        <a href="{{ url_for('alumno.listar_docentes') }}">Buscar Profesores</a>
+        <a href="{{ url_for('alumno.perfil') }}">Mi Perfil</a>
         <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}">Ver cursos disponibles</a>
-        <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+        
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="logout-link">Cerrar Sesión</a>
     </aside>
 
-    <main class="main" style="padding: 40px; align-items: flex-start; justify-content: flex-start;">
-      <div class="welcome-card" style="width: 100%;">
-        <h1>¡Bienvenido, {{ session['username'] }}!</h1>
-        <p>Has iniciado sesión como <strong>Alumno</strong>. Aquí podrás ver tus progresos.</p>
+    <main class="main-content">
 
-        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
-            <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; text-align: center;">
-                <h3>0</h3>
-                <p>Cursos Activos</p>
+      <div class="welcome-card">
+        <h1>¡Bienvenido, {{ session['username'] }}!</h1>
+        <p>Has iniciado sesión como <strong>Alumno</strong>. Aquí podrás ver tus progresos y continuar tu aprendizaje.</p>
+
+        <div class="metrics-grid">
+            <div class="metric-box metric-blue">
+                <h3>{{ cursos|length }}</h3>
+                <p>Cursos Inscritos</p>
             </div>
-            <div style="background: #f1f8e9; padding: 20px; border-radius: 10px; text-align: center;">
+            <div class="metric-box metric-green">
                 <h3>0</h3>
                 <p>Tareas Pendientes</p>
             </div>
-            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; text-align: center;">
+            <div class="metric-box metric-orange">
                 <h3>A1</h3>
                 <p>Nivel Actual</p>
             </div>
         </div>
       </div>
+
     </main>
   </div>
 </body>

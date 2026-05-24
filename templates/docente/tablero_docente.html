@@ -6,93 +6,80 @@
   <title>Panel de Docente</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}" />
   <style>
+      /* --- Estilos Generales y Layout --- */
+      html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
+      .layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+      
+      /* --- Barra Lateral (Diseño de Sistema) --- */
+      .sidebar { width: 260px; min-width: 260px; background: #30244D; padding: 25px 20px; color: white; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; height: 100%; }
+      .sidebar h2 { margin: 0 0 10px 0; text-align: center; }
+      .sidebar hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; width: 100%; }
+      .sidebar a { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: bold; padding: 12px 15px; border-radius: 8px; transition: all 0.2s; font-size: 0.95rem; display: block; }
+      .sidebar a:hover { background: rgba(255,255,255,0.1); color: white; }
+      .sidebar a.active { background: rgba(255,255,255,0.2); color: white; box-shadow: inset 4px 0 0 #4CAF50; padding-left: 18px; }
+      
+      /* Botón especial en el sidebar para crear curso */
+      .sidebar a.btn-create { background: #4CAF50; color: white; text-align: center; margin: 10px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+      .sidebar a.btn-create:hover { background: #45a049; color: white; transform: translateY(-1px); }
 
-      .sidebar { padding: 20px; color: white; display: flex; flex-direction: column; gap: 20px; }
-      .sidebar a { color: white; text-decoration: none; font-weight: bold; padding: 10px; border-radius: 5px; }
-      .sidebar a:hover { background: rgba(255,255,255,0.2); }
+      .sidebar .logout-link { margin-top: auto; color: #ff6b6b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; border-radius: 0; }
+      .sidebar .logout-link:hover { background: transparent; color: #ff8787; text-decoration: underline; }
 
+      /* --- Contenido Principal --- */
+      .main-content { flex: 1; padding: 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; height: 100%; background: #f4f6f9; }
+      
+      /* --- Tarjeta de Bienvenida y Métricas --- */
+      .welcome-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box; }
+      .welcome-card h1 { margin-top: 0; color: #30244D; font-size: 2rem; font-weight: 700; }
+      .welcome-card p { color: #555; font-size: 1.05rem; margin-top: 5px; }
 
-      .welcome-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-
-
-      table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-      th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eaeaea; }
-      th { background-color: #f8f9fa; color: #333; font-weight: bold; }
-      tr:hover { background-color: #f1f1f1; }
-      .btn-action { color: #007bff; text-decoration: none; font-weight: bold; margin-right: 15px; }
-      .btn-action:hover { text-decoration: underline; color: #0056b3; }
-      .btn-primary { background: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; }
-      .btn-primary:hover { background: #0056b3; }
+      .metrics-grid { margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+      .metric-box { padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+      .metric-box h3 { margin: 0; font-size: 2.2rem; color: #30244D; }
+      .metric-box p { margin: 5px 0 0 0; font-weight: bold; color: #666; font-size: 0.95rem; }
+      
+      .metric-blue { background: #e3f2fd; }
+      .metric-green { background: #f1f8e9; }
+      .metric-orange { background: #fff3e0; }
   </style>
 </head>
 <body>
   <div class="layout">
 
     <aside class="sidebar">
-        <h2></h2>
+        <h2>🧑‍💻 Sistema</h2>
         <hr>
-        <a href="#">Mis Cursos</a>
-        <a href="{{ url_for('docente.crear_curso_vista') }}" class="btn-primary">Crear Nuevo Curso</a>
-        <a href="#">Mis Alumnos</a>
-        <a href="#">Mi Perfil</a>
-        <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
+        <a href="{{ url_for('docente.tablero_docente') }}" class="active">Tablero Personal</a>
+        <a href="{{ url_for('docente.mis_cursos_docente') }}">Mis Cursos</a>
+        <a href="{{ url_for('docente.crear_curso_vista') }}" class="btn-create">➕ Crear Nuevo Curso</a>
+        <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
+        
+        <a href="{{ url_for('auth.cerrar_sesion') }}" class="logout-link">Cerrar Sesión</a>
     </aside>
 
-    <main class="main" style="padding: 40px; align-items: flex-start; justify-content: flex-start; width: 100%;">
+    <main class="main-content">
 
-      <div class="welcome-card" style="width: 100%;">
+      <div class="welcome-card">
         <h1>¡Bienvenido, {{ nombre }}!</h1>
         <p>Has iniciado sesión como <strong>Docente</strong>. Aquí podrás gestionar tus clases y alumnos.</p>
 
-        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
-            <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; text-align: center;">
-                <h3>{{ cursos|length }}</h3> <p>Cursos Creados</p>
+        <div class="metrics-grid">
+            <div class="metric-box metric-blue">
+                <h3>{{ cursos|length }}</h3> 
+                <p>Cursos Creados</p>
             </div>
-            <div style="background: #f1f8e9; padding: 20px; border-radius: 10px; text-align: center;">
+            <div class="metric-box metric-green">
                 <h3>0</h3>
                 <p>Alumnos Inscritos</p>
             </div>
-            <div style="background: #fff3e0; padding: 20px; border-radius: 10px; text-align: center;">
+            <div class="metric-box metric-orange">
                 <h3>0</h3>
                 <p>Tareas por Revisar</p>
             </div>
         </div>
       </div>
 
-      <div class="welcome-card" style="width: 100%;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0;">Cursos que impartes</h2>
-            <a href="{{ url_for('docente.crear_curso_vista') }}" class="btn-primary">+ Nuevo Curso</a>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre del Curso</th>
-                    <th>Nivel</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for curso in cursos %}
-                <tr>
-                    <td><strong>{{ curso.nombre_curso }}</strong></td>
-                    <td>{{ curso.nivel }}</td>
-                    <td>
-                        <a href="{{ url_for('docente.gestionar_curso_vista', id_curso=curso.id_curso) }}" class="btn-action">Gestionar</a>
-                        <a href="{{ url_for('docente.curso_docente', id_curso=curso.id_curso) }}" class="btn-action">Ver Alumnos</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="3" style="text-align: center; color: #777; padding: 30px;">
-                        Aún no tienes cursos creados. Haz clic en "+ Nuevo Curso" para empezar.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-      </div>
+      {% include 'curso_lista.html' %}
 
     </main>
   </div>
@@ -124,16 +111,18 @@
 
             document.body.appendChild(toast);
 
+            // Aparecer
             setTimeout(() => {
               toast.style.opacity = '1';
               toast.style.transform = 'translateY(0)';
             }, 50);
 
+            // Desaparecer
             setTimeout(() => {
               toast.style.opacity = '0';
               toast.style.transform = 'translateY(-10px)';
               setTimeout(() => toast.remove(), 400);
-            }, 1000);
+            }, 3000); // Modificado a 3000ms para que el mensaje sea visible por más tiempo
           })();
         </script>
       {% endfor %}

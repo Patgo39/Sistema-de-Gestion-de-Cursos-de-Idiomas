@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Perfil del Docente</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css', v='3.0') }}">
+  <style>
+      /* --- Estilos Generales y Layout --- */
+      html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
+      .layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+      
+      /* --- Barra Lateral (Diseño de Sistema) --- */
+      .sidebar { width: 260px; min-width: 260px; background: #30244D; padding: 25px 20px; color: white; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; height: 100%; }
+      .sidebar h2 { margin: 0 0 10px 0; text-align: center; }
+      .sidebar hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; width: 100%; }
+      .sidebar a { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: bold; padding: 12px 15px; border-radius: 8px; transition: all 0.2s; font-size: 0.95rem; display: block; }
+      .sidebar a:hover { background: rgba(255,255,255,0.1); color: white; }
+      .sidebar a.active { background: rgba(255,255,255,0.2); color: white; box-shadow: inset 4px 0 0 #4CAF50; padding-left: 18px; }
+      .sidebar .logout-link { margin-top: auto; color: #ff6b6b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; border-radius: 0; }
+      .sidebar .logout-link:hover { background: transparent; color: #ff8787; text-decoration: underline; }
+
+      /* --- Contenido Principal --- */
+      .main-content { flex: 1; padding: 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; height: 100%; background: #f4f6f9; }
+      .main-title { color: #30244D; margin: 0; font-size: 2rem; font-weight: 700; }
+      .main-subtitle { color: #666; margin: 5px 0 0 0; font-size: 1.05rem; }
+
+      /* --- Contenedor Principal (Tarjetas Blancas) --- */
+      .content-card { background: white; padding: 35px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 900px; box-sizing: border-box; }
+      
+      /* --- Cuadrícula del Perfil --- */
+      .profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+      .profile-item { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 14px 16px; transition: border-color 0.2s; }
+      .profile-item:hover { border-color: #d1d5db; }
+      .profile-item.full-width { grid-column: span 2; }
+      
+      .label { display: block; font-size: 0.85rem; font-weight: 700; color: #30244D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.02em; }
+      .value { display: block; color: #333; font-size: 0.98rem; word-break: break-word; }
+
+      /* --- Botones y Acciones --- */
+      .actions { margin-top: 30px; display: flex; gap: 15px; align-items: center; border-top: 1px solid #eee; padding-top: 20px; }
+      
+      .btn { padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer; text-decoration: none; border: none; transition: all 0.2s; text-align: center; display: inline-block; }
+      .btn-primary { background: #30244D; color: white; }
+      .btn-primary:hover { background: #42326b; }
+
+      /* --- Responsividad --- */
+      @media (max-width: 768px) {
+        .layout { flex-direction: column; height: auto; min-height: 100vh; }
+        .sidebar { width: 100%; min-width: 0; height: auto; }
+        .main-content { padding: 20px; }
+        .profile-grid { grid-template-columns: 1fr; }
+        .profile-item.full-width { grid-column: span 1; }
+      }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    
+    <aside class="sidebar">
+      <h2>🧑‍💻 Sistema</h2>
+      <hr>
+      <a href="{{ url_for('alumno.tablero_alumno') }}">Tablero Principal</a>
+      <a href="{{ url_for('alumno.mis_cursos') }}">Mis Cursos</a>
+      <a href="{{ url_for('alumno.listar_docentes') }}">Buscar Profesores</a>
+      <a href="#" class="active">Perfil del docente</a>
+      <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}">Ver cursos disponibles</a>
+      <a href="{{ url_for('auth.cerrar_sesion') }}" class="logout-link">Cerrar Sesión</a>
+    </aside>
+
+    <main class="main-content">
+      
+      <div>
+        <h1 class="main-title">Perfil del docente</h1>
+        <p class="main-subtitle">Esta vista es solo de lectura. El alumno no puede modificar la información.</p>
+      </div>
+
+      <div class="content-card">
+        <div class="profile-grid">
+            
+          <div class="profile-item full-width">
+            <span class="label">Nombre completo</span>
+            <span class="value">{{ docente.perfil_usuario.nombre or '' }} {{ docente.perfil_usuario.apellido_paterno or '' }} {{ docente.perfil_usuario.apellido_materno or '' }}</span>
+          </div>
+
+          <div class="profile-item">
+            <span class="label">Username</span>
+            <span class="value">{{ docente.perfil_usuario.username or '—' }}</span>
+          </div>
+
+          <div class="profile-item">
+            <span class="label">Email</span>
+            <span class="value">{{ docente.perfil_usuario.email or '—' }}</span>
+          </div>
+
+          <div class="profile-item">
+            <span class="label">Especialidad</span>
+            <span class="value">{{ docente.especialidad or 'No especificada' }}</span>
+          </div>
+
+          <div class="profile-item">
+            <span class="label">Tiempo de experiencia</span>
+            <span class="value">{{ docente.tiempo_experiencia if docente.tiempo_experiencia is not none else 'No especificado' }} años</span>
+          </div>
+
+          <div class="profile-item">
+            <span class="label">Género</span>
+            <span class="value">{{ docente.perfil_usuario.genero or '—' }}</span>
+          </div>
+
+          <div class="profile-item">
+            <span class="label">País</span>
+            <span class="value">{{ docente.perfil_usuario.pais or '—' }}</span>
+          </div>
+
+          <div class="profile-item">
+            <span class="label">Fecha de nacimiento</span>
+            <span class="value">{{ docente.perfil_usuario.fecha_nacimiento.strftime('%d/%m/%Y') if docente.perfil_usuario.fecha_nacimiento else '—' }}</span>
+          </div>
+          
+        </div>
+
+        <div class="actions">
+          <a href="{{ url_for('alumno.listar_docentes') }}" class="btn btn-primary">Volver a docentes</a>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+</body>
+</html>
