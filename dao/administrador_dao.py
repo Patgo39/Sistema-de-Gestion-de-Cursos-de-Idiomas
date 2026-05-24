@@ -64,6 +64,20 @@ class AdministradorDao:
 
             campos_admin = ['nivel_privilegio']
 
+            if 'username' in datos and datos['username']:
+
+                if datos['username'] is None or not str(datos['username']).strip():
+                    raise Exception("El username no puede ser vacio.")
+
+                nuevo_username = datos['username']
+                usuario_existente = Usuario.query.filter(
+                    Usuario.username == nuevo_username,
+                    Usuario.id_usuario != admin.id_usuario
+                ).first()
+
+                if usuario_existente:
+                    raise Exception(f"El nombre de usuario '{nuevo_username}' ya está en uso por otra cuenta.")
+
             for campo in campos_usuario:
                 if campo in datos:
                     setattr(usuario, campo, datos[campo])

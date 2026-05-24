@@ -45,6 +45,7 @@ def tablero_docente():
     nombre = session.get('username')
     id_usuario = session.get('usuario')
     mis_cursos = CursoDao.obtener_cursos_por_docente(id_usuario)
+    DocenteDao.actualizar_ultimo_acceso(id_usuario)
     return render_template('docente/tablero_docente.html', nombre=nombre, cursos=mis_cursos, role='docente')
 
 
