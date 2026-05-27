@@ -85,8 +85,8 @@
 
             <div class="card-actions">
               {% if role == 'docente' %}
-                <a href="{{ url_for('docente.acceder_curso_docente', id_curso=curso.id_curso) }}" class="btn-manage">Acceder al Curso</a>
-                <a href="{{ url_for('docente.curso_docente', id_curso=curso.id_curso) }}" class="btn-primary">Ver Alumnos</a>
+                <a href="{{ url_for('docente.acceder_curso_docente', id_curso=curso.id_curso) }}" class="btn-manage">Gestionar Curso</a>
+                <a href="{{ url_for('docente.curso_docente', id_curso=curso.id_curso) }}" class="btn-primary">Entrar a Curso</a>
               {% else %}
                 <a href="{{ url_for('alumno.curso_detalle', id_curso=curso.id_curso) }}" class="btn-primary">Entrar al Aula</a>
               {% endif %}

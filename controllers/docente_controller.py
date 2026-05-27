@@ -79,12 +79,23 @@ def perfil_docente():
             'genero': request.form.get('genero'),
             'pais': request.form.get('pais')
         }
-        success = UsuarioDao.actualizar_perfil_basico(usuario.id_usuario, datos)
-        if success:
+
+        llaves_docente = ["nombre", "apellido_paterno", "apellido_materno",
+                         "email", "fecha_nacimiento", "genero", "pais"]
+
+        datos_verificados = {}
+        for key, value in datos.items():
+            if key in llaves_docente:
+                if value is not None and value != "":
+                    datos_verificados[key] = value
+
+        try:
+            DocenteDao.actualizar_docente(usuario.id_usuario, datos_verificados)
             flash('Perfil actualizado correctamente', 'success')
-        else:
-            flash('Error al actualizar el perfil', 'error')
-        return redirect(url_for('docente.perfil_docente'))
+        except Exception as e:
+            msg = str(e)
+            flash(f"Error: {msg}", category="error")
+            return redirect(url_for('docente.perfil_docente'))
 
     return render_template('perfil.html', usuario=usuario, role='docente')
 

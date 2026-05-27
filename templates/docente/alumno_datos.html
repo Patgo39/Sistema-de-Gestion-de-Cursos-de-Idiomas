@@ -4,49 +4,81 @@
     <meta charset="UTF-8">
     <title>{{ alumno.nombre_completo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/docente/alumno_datos.css') }}">
+    <style>
+        /* Estilos aplicados para la alineación horizontal y eliminación de barra lateral */
+        html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
+        .layout { display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100vw; padding: 20px; box-sizing: border-box; }
+        .main { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 600px; box-sizing: border-box; }
+        .card-header h2 { color: #30244D; margin: 0 0 25px 0; font-size: 1.8rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+
+        /* Contenedor Flexbox para alinear el label y el dato a los lados */
+        .info-field { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; font-size: 1rem; }
+        /* Se sube el min-width a 160px para dar espacio cómodo a los nuevos atributos largos */
+        .info-field label { font-weight: bold; color: #30244D; min-width: 160px; margin: 0; }
+        .info-field p { color: #555; margin: 0; }
+
+        .divider { border: 0; border-top: 1px solid #eee; margin: 25px 0; }
+
+        /* Contenedor para alinear los botones principales */
+        .actions-container { display: flex; gap: 15px; align-items: center; }
+
+        /* Estilos base de botones */
+        .btn-danger { background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+        .btn-danger:hover { background: #dc2626; }
+
+        .btn-secondary { background: #f4f6f9; color: #555; border: 1px solid #ccc; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; text-decoration: none; display: inline-block; text-align: center; transition: all 0.2s; }
+        .btn-secondary:hover { background: #e4e6e9; color: #30244D; }
+    </style>
 </head>
 <body>
     <div class="layout">
-        <aside class="sidebar">
-            <h2></h2>
-            <hr>
-            <a href="#">Mis Cursos</a>
-            <a href="#">Crear Nuevo Curso</a>
-            <a href="#">Mis Alumnos</a>
-            <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
-            <a href="{{ url_for('auth.cerrar_sesion') }}" style="margin-top: auto; color: #ff6b6b;">Cerrar Sesión</a>
-        </aside>
         <div class="main">
             <div class="card-header">
                 <h2>{{ alumno.nombre_completo }}</h2>
             </div>
 
             <div class="info-field">
-                <label>ID</label>
+                <label>ID:</label>
                 <p>{{ id_usuario }}</p>
             </div>
             <div class="info-field">
-                <label>Email</label>
+                <label>Email:</label>
                 <p>{{ alumno.email }}</p>
             </div>
             <div class="info-field">
-                <label>Género</label>
+                <label>Género:</label>
                 <p>{{ alumno.genero }}</p>
             </div>
             <div class="info-field">
-                <label>Grado actual</label>
+                <label>Fecha de nacimiento:</label>
+                <p>{{ alumno.fecha_nacimiento.strftime('%d/%m/%Y') if alumno.fecha_nacimiento else 'No especificada' }}</p>
+            </div>
+            <div class="info-field">
+                <label>Grado actual:</label>
                 <p>{{ alumno.grado_actual }}</p>
+            </div>
+            <div class="info-field">
+                <label>País:</label>
+                <p>{{ alumno.pais or 'No especificado' }}</p>
+            </div>
+            <div class="info-field">
+                <label>Último acceso:</label>
+                <p>{{ alumno.ultima_fecha_acceso.strftime('%d/%m/%Y %H:%M') if alumno.ultima_fecha_acceso else 'Sin accesos registrados' }}</p>
             </div>
 
             <hr class="divider">
 
-            <button type="button" class="btn-danger" onclick="document.getElementById('modal').style.display='flex'">
-                Eliminar alumno
-            </button>
+            <div class="actions-container">
+                <button type="button" class="btn-danger" onclick="document.getElementById('modal').style.display='flex'">
+                    Eliminar alumno
+                </button>
+                <a href="{{ url_for('docente.curso_docente', id_curso=curso.id_curso) }}" class="btn-secondary">
+                    Volver
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Modal -->
     <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
          background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:100;">
         <div style="background:#fff; border-radius:16px; padding:36px 32px; max-width:400px;
@@ -61,7 +93,7 @@
                     Cancelar
                 </button>
                 <form action="{{ url_for('docente.eliminar_alumno', id_curso=id_curso, id_alumno=id_usuario) }}" method="POST">
-                    <button type="submit" class="btn-danger">Confirmar</button>
+                    <button type="submit" class="btn-danger" style="height:40px; padding:0 20px; border-radius:10px;">Confirmar</button>
                 </form>
             </div>
         </div>

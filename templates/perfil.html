@@ -31,20 +31,26 @@
       input[readonly] { background: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: #e4e7ed; }
       input:focus, select:focus { border-color: #30244D; outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(48, 36, 77, 0.15); }
       .actions { margin-top: 30px; display: flex; gap: 15px; align-items: center; }
+
+      /* Estilos para el botón guardar cambios */
       .btn-submit { background: #30244D; color: white; padding: 12px 28px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.95rem; transition: background 0.2s; }
       .btn-submit:hover { background: #42326b; }
+      /* Estilo visual cuando el botón está deshabilitado */
+      .btn-submit:disabled { background: #a39cb5; color: #e1dee6; cursor: not-allowed; }
+
       .btn-cancel { color: #666; text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: color 0.2s; }
       .btn-cancel:hover { color: #30244D; text-decoration: underline; }
     </style>
   </head>
   <body>
     <div class="layout">
-      
+
       <aside class="sidebar">
         <h2>🧑‍💻 Sistema</h2>
         <hr>
         {% if role == 'docente' %}
           <a href="{{ url_for('docente.tablero_docente') }}">Tablero Principal</a>
+          <a href="{{ url_for('docente.crear_curso_vista') }}" class="btn-create">➕ Crear Nuevo Curso</a>
           <a href="#" class="active">Mi Perfil</a>
         {% else %}
           <a href="{{ url_for('alumno.tablero_alumno') }}">Tablero Principal</a>
@@ -57,7 +63,7 @@
       </aside>
 
       <main class="main-content">
-        
+
         <div>
           <h1 class="main-title">Mi Perfil</h1>
           <p class="main-subtitle">Gestiona tu información personal y mantén tus datos actualizados.</p>
@@ -74,10 +80,10 @@
         {% endwith %}
 
         <div class="profile-card">
-          <form method="POST" action="">
-            
+          <form id="perfilForm" method="POST" action="">
+
             <div class="form-grid">
-              
+
               <div class="form-group full-width">
                 <label>Username</label>
                 <input type="text" name="username" value="{{ usuario.username }}" readonly />
@@ -112,9 +118,9 @@
                 <label>Género</label>
                 <select name="genero">
                   <option value="">Seleccione</option>
-                  <option value="Masculino" {% if usuario.genero=='Masculino' %}selected{% endif %}>Masculino</option>
-                  <option value="Femenino" {% if usuario.genero=='Femenino' %}selected{% endif %}>Femenino</option>
-                  <option value="Otro" {% if usuario.genero=='Otro' %}selected{% endif %}>Otro</option>
+                  <option value="M" {% if usuario.genero=='M' or usuario.genero=='Masculino' %}selected{% endif %}>Masculino (M)</option>
+                  <option value="F" {% if usuario.genero=='F' or usuario.genero=='Femenino' %}selected{% endif %}>Femenino (F)</option>
+                  <option value="O" {% if usuario.genero=='O' or usuario.genero=='Otro' %}selected{% endif %}>Otro (O)</option>
                 </select>
               </div>
 
@@ -126,8 +132,8 @@
             </div>
 
             <div class="actions">
-              <button type="submit" class="btn-submit">Guardar Cambios</button>
-              
+              <button type="submit" id="btnGuardar" class="btn-submit" disabled>Guardar Cambios</button>
+
               {% if role == 'docente' %}
                 <a href="{{ url_for('docente.tablero_docente') }}" class="btn-cancel">Cancelar</a>
               {% else %}
@@ -140,5 +146,22 @@
 
       </main>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("perfilForm");
+        const btnGuardar = document.getElementById("btnGuardar");
+
+        // Escucha cambios interactivos en cualquier campo del formulario
+        form.addEventListener("input", function() {
+          btnGuardar.disabled = false;
+        });
+
+        // Específico para el elemento select, por si se cambia usando solo el teclado/clic
+        form.addEventListener("change", function() {
+          btnGuardar.disabled = false;
+        });
+      });
+    </script>
   </body>
 </html>
