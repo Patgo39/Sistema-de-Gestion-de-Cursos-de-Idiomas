@@ -1,6 +1,9 @@
+from sqlalchemy.orm import joinedload
+
 from db import db
 from models.curso import Curso
 from models.inscribir import Inscribir
+from models.docente import Docente
 from models.alumno import Alumno
 
 class CursoDao:
@@ -157,6 +160,8 @@ class CursoDao:
                 Inscribir, Curso.id_curso == Inscribir.id_curso
             ).filter(
                 Inscribir.id_alumno == id_usuario
+            ).options(
+                joinedload(Curso.docente).joinedload(Docente.perfil_usuario)
             ).all()
 
             return cursos_inscritos
@@ -191,7 +196,9 @@ class CursoDao:
                     'nombre_curso': c.nombre_curso,
                     'descripcion': c.descripcion,
                     'nivel': c.nivel,
-                    'docente': c.docente.perfil_usuario.nombre if c.docente and c.docente.perfil_usuario else None,
+                    # CONCATENAMOS NOMBRE Y APELLIDOS AQUÍ:
+                    'docente': f"{c.docente.perfil_usuario.nombre} {c.docente.perfil_usuario.apellido_paterno or ''} {c.docente.perfil_usuario.apellido_materno or ''}".strip() if c.docente and c.docente.perfil_usuario else "Sin asignar",
+                    'id_usuario': c.docente.perfil_usuario.id_usuario if c.docente and c.docente.perfil_usuario else None,
                     'idioma': c.idioma.nombre_idioma if c.idioma else None,
                 }
                 for c in cursos
