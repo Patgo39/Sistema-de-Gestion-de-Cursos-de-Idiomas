@@ -9,7 +9,7 @@
       /* --- Estilos Generales y Layout --- */
       html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
       .layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
-      
+
       /* --- Barra Lateral (Diseño de Sistema) --- */
       .sidebar { width: 260px; min-width: 260px; background: #30244D; padding: 25px 20px; color: white; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; height: 100%; }
       .sidebar h2 { margin: 0 0 10px 0; text-align: center; }
@@ -22,7 +22,7 @@
 
       /* --- Contenido Principal --- */
       .main-content { flex: 1; padding: 40px; box-sizing: border-box; display: flex; flex-direction: column; overflow-y: auto; height: 100%; background: #f4f6f9; }
-      
+
       /* --- Encabezado del Curso --- */
       .course-header { background: #30244D; color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; }
       .course-header h2 { margin: 0 0 10px 0; font-size: 2rem; }
@@ -30,7 +30,7 @@
 
       /* --- Layout de Columnas --- */
       .content-grid { display: grid; grid-template-columns: 1fr 350px; gap: 25px; align-items: start; }
-      
+
       /* --- Tarjetas de Contenido --- */
       .info-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
       .info-card h3 { margin-top: 0; color: #30244D; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 20px; }
@@ -44,9 +44,11 @@
       .material-link:hover { text-decoration: underline; color: #0097a7; }
       .material-desc { color: #666; font-size: 0.9rem; margin: 0; }
 
-      .student-list { padding-left: 20px; color: #555; }
-      .student-list li { margin-bottom: 10px; }
-      .student-link { color: #30244D; text-decoration: none; font-weight: bold; }
+      /* --- Caja de Scroll para Alumnos (1/3 de la pantalla de alto) --- */
+      .student-scroll-container { height: 33vh; overflow-y: auto; background: #f8f9fa; border: 1px solid #eaeaea; padding: 15px; border-radius: 8px; box-sizing: border-box; }
+      .student-list { padding-left: 20px; color: #555; margin: 0; }
+      .student-list li { margin-bottom: 12px; }
+      .student-link { color: #30244D; text-decoration: none; font-weight: bold; font-size: 0.95rem; }
       .student-link:hover { text-decoration: underline; color: #4CAF50; }
 
       /* --- Formulario --- */
@@ -54,9 +56,17 @@
       .form-control { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: inherit; font-size: 0.95rem; }
       textarea.form-control { resize: vertical; min-height: 80px; }
       input[type="file"].form-control { padding: 10px; background: white; }
-      
+
       .btn-primary { background: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.2s; }
       .btn-primary:hover { background: #45a049; }
+
+      /* --- Botón del Perfil del Docente (Mismo color azul de Sidebar y 100% de ancho) --- */
+      .btn-docente-info { background: #30244D; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; transition: background 0.2s; text-align: center; text-decoration: none; display: block; margin-top: 20px; }
+      .btn-docente-info:hover { background: #42326b; }
+
+      /* --- Botón de Gestión de Curso para Docente (Color Verde de Éxito) --- */
+      .btn-docente-manage { background: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; transition: background 0.2s; text-align: center; text-decoration: none; display: block; margin-top: 20px; }
+      .btn-docente-manage:hover { background: #439a46; }
 
       .empty-message { color: #888; font-style: italic; }
 
@@ -68,16 +78,18 @@
 </head>
 <body>
   <div class="layout">
-    
+
     <aside class="sidebar">
       <h2>🧑‍💻 Sistema</h2>
       <hr>
       {% if role == 'docente' %}
         <a href="{{ url_for('docente.tablero_docente') }}">Tablero Principal</a>
+        <a href="{{ url_for('docente.crear_curso_vista') }}" class="btn-create">➕ Crear Nuevo Curso</a>
         <a href="{{ url_for('docente.perfil_docente') }}">Mi Perfil</a>
       {% else %}
         <a href="{{ url_for('alumno.tablero_alumno') }}">Tablero Principal</a>
         <a href="{{ url_for('alumno.mis_cursos') }}" class="active">Mis Cursos</a>
+        <a href="{{ url_for('alumno.listar_docentes') }}">Buscar Profesores</a>
         <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}">Ver cursos disponibles</a>
         <a href="{{ url_for('alumno.perfil') }}">Mi Perfil</a>
       {% endif %}
@@ -85,17 +97,17 @@
     </aside>
 
     <main class="main-content">
-      
+
       <div class="course-header">
         <h2>{{ curso.nombre_curso }} <span style="opacity: 0.7; font-size: 1.2rem;">#{{ curso.id_curso }}</span></h2>
         <p>{{ curso.descripcion }}</p>
       </div>
 
       <section class="content-grid">
-        
+
         <div class="info-card">
           <h3>Materiales del Curso</h3>
-          
+
           {% if recursos %}
             <ul class="material-list">
               {% for r in recursos %}
@@ -131,16 +143,33 @@
 
           {% if role == 'docente' and lista_inscripcion %}
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            <h4>Alumnos inscritos</h4>
-            <ol class="student-list">
-              {% for a in lista_inscripcion %}
-                <li>
-                  <a href="{{ url_for('docente.datos_alumno', id_curso=curso.id_curso, id_usuario=a.id_usuario) }}" class="student-link">
-                    {{ a.nombre_completo }}
-                  </a>
-                </li>
-              {% endfor %}
-            </ol>
+            <h4 style="margin-bottom: 10px;">Alumnos inscritos</h4>
+
+            <div class="student-scroll-container">
+              <ol class="student-list">
+                {% for a in lista_inscripcion %}
+                  <li>
+                    <a href="{{ url_for('docente.datos_alumno', id_curso=curso.id_curso, id_usuario=a.id_usuario) }}" class="student-link">
+                      {{ a.nombre_completo }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ol>
+            </div>
+          {% endif %}
+
+          {# --- BOTÓN DOCENTE: Solo se muestra al docente para acceder a la gestión interna --- #}
+          {% if role == 'docente' %}
+            <a href="{{ url_for('docente.acceder_curso_docente', id_curso=curso.id_curso) }}" class="btn-docente-manage">
+              Gestionar curso
+            </a>
+          {% endif %}
+
+          {# --- BOTÓN ALUMNO --- #}
+          {% if role != 'docente' and curso.docente and curso.docente.perfil_usuario %}
+            <a href="{{ url_for('alumno.perfil_docente_publico', id_docente=curso.docente.perfil_usuario.id_usuario) }}" class="btn-docente-info">
+              Ver Información del Docente
+            </a>
           {% endif %}
         </div>
 

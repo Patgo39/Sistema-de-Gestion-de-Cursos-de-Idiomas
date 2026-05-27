@@ -9,7 +9,7 @@
       /* --- Estilos Generales y Layout --- */
       html, body { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #f4f6f9; }
       .layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
-      
+
       /* --- Barra Lateral (Diseño de Sistema) --- */
       .sidebar { width: 260px; min-width: 260px; background: #30244D; padding: 25px 20px; color: white; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; height: 100%; }
       .sidebar h2 { margin: 0 0 10px 0; text-align: center; }
@@ -32,10 +32,10 @@
       /* --- Tarjetas de Acordeón (Cursos) --- */
       .course-list { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; }
       .course-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #eaeaea; overflow: hidden; }
-      
+
       .course-header { padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; user-select: none; }
       .course-header:hover { background: #f8f9fa; }
-      
+
       .course-title-group { display: flex; align-items: center; gap: 15px; }
       .course-title { font-size: 1.15rem; font-weight: 700; color: #30244D; margin: 0; }
       .badge-level { background: #e3f2fd; color: #0288d1; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -43,7 +43,7 @@
 
       .course-body { padding: 0 25px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; background: #fafafa; border-top: 1px solid transparent; box-sizing: border-box; }
       .course-body.abierto { max-height: 500px; padding: 25px; border-top-color: #eaeaea; }
-      
+
       .course-info { margin: 0 0 12px 0; color: #444; font-size: 0.95rem; line-height: 1.5; }
       .course-info strong { color: #30244D; }
 
@@ -65,21 +65,20 @@
 </head>
 <body>
   <div class="layout">
-    
+
     <aside class="sidebar">
         <h2>🧑‍💻 Sistema</h2>
         <hr>
         <a href="{{ url_for('alumno.tablero_alumno') }}">Tablero Principal</a>
         <a href="{{ url_for('alumno.mis_cursos') }}">Mis Cursos</a>
         <a href="{{ url_for('alumno.listar_docentes') }}">Buscar Profesores</a>
-        <a href="{{ url_for('alumno.perfil') }}">Mi Perfil</a>
         <a href="{{ url_for('alumno.tablero_cursos_disponibles_alumno') }}" class="active">Ver cursos disponibles</a>
-        
+        <a href="{{ url_for('alumno.perfil') }}">Mi Perfil</a>
         <a href="{{ url_for('auth.cerrar_sesion') }}" class="logout-link">Cerrar Sesión</a>
     </aside>
 
     <main class="main-content">
-        
+
         <div>
             <h1 class="main-title">Cursos Disponibles</h1>
             <p class="main-subtitle">Explora el catálogo e inscríbete en los cursos que sean de tu interés.</p>
@@ -99,20 +98,30 @@
             {% if cursos_disponibles %}
                 {% for curso in cursos_disponibles %}
                 <div class="course-card">
-                    
+
                     <div class="course-header" onclick="toggle({{ loop.index }})">
                         <div class="course-title-group">
                             <span class="course-title">{{ curso.nombre_curso }}</span>
                             <span class="badge-level">{{ curso.nivel or 'Sin nivel' }}</span>
                         </div>
-                        <span class="course-id">#{{ curso.id_curso }}</span>
+                        <span class="course-id"><strong>ID Curso:</strong>#{{ curso.id_curso }}</span>
                     </div>
-                    
+
                     <div class="course-body" id="curso-{{ loop.index }}">
                         <p class="course-info"><strong>Profesor:</strong> {{ curso.docente or 'Sin asignar' }}</p>
-                        <p class="course-info"><strong>Idioma:</strong> {{ curso.idioma or 'Sin especificar' }}</p>
+
+                        <p class="course-info"><strong>ID Docente:</strong> #{{ curso.id_usuario or 'N/A' }}</p>
+
+                        <p class="course-info"><strong>Idioma:</strong>
+                            {% if curso.idioma is mapping %}
+                                {{ curso.idioma.nombre_idioma }}
+                            {% else %}
+                                {{ curso.idioma or 'Sin especificar' }}
+                            {% endif %}
+                        </p>
+
                         <p class="course-info"><strong>Descripción:</strong> {{ curso.descripcion or 'Sin descripción' }}</p>
-                        
+
                         <form action="{{ url_for('alumno.inscripcion_curso_disponibles', id_curso=curso.id_curso) }}" method="POST" style="margin-top: 15px;">
                             <button type="submit" class="btn btn-primary">Inscribirse al Curso</button>
                         </form>
